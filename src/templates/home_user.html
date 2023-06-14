@@ -7,13 +7,21 @@
 
 
 {% block buttons %}
-<div class="col-lg-6 text-center text-lg-right">
-    <div class="d-inline-flex align-items-center mt-2">
-        <a href="{{ url_for('registro_usuario') }}" class="btn btn-danger">Registrarse</a>
-        <button type="button" class="btn btn-primary" data-toggle="modal" data-target="#iniciosesion">Iniciar sesión</button>
-        <!-- <a href="{{ url_for('login_usuario') }}" class="btn btn-outline-dark me-2">Iniciar Sesión</a> -->
+<div class="col-xs-4 col-md-3 col-lg-2">
+    <div class="flex-shrink-0 dropdown m-5">
+      <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
+        <img src="{{ url_for('static', filename='candelaicono.webp')}}" alt="mdo" width="42" height="42" class="rounded-circle">
+      </a>
+      <ul class="dropdown-menu shadow p-10">
+        <li><a class="dropdown-item ml-3" href="#">Mi perfil</a></li>
+        <li><a class="dropdown-item" href="#">Configuración</a></li>
+        <li>
+          <hr class="dropdown-divider">
+        </li>
+        <li><a class="dropdown-item" href="{{ url_for('CerrarSesion') }}">Cerrar Sesión</a></li>
+      </ul>
     </div>
-</div>
+  </div>
 {% endblock %}
 {% block body %}
 <!-- Modal -->

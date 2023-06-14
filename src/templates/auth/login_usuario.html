@@ -7,19 +7,24 @@
 {% endblock %}
 
 {% block body %}
-<form class="form-signin text-center">
+<form class="form-signin text-center" action="/login_usuario" method="POST">
     <img class="mb-4" src="{{ url_for('static', filename='img/como.jpg') }}" alt="" width="100" height="100">
     <h1 class="h3 mb-3 fw-normal">Inicio de sesión</h1>
 
     <div class="form-floating">
-      <input type="email" class="form-control" id="floatingInput" placeholder="Usuario">
-      <label for="floatingInput">Usuario</label>
+      <input type="text" class="form-control" id="correo" name="correo" placeholder="Correo eléctronico">
+      <label for="floatingInput">Correo electronico</label>
     </div>
     <div class="form-floating">
-      <input type="password" class="form-control" id="floatingPassword" placeholder="contraseña">
+      <input type="password" class="form-control" id="contraseña" name="contraseña" placeholder="contraseña">
       <label for="floatingPassword">Contraseña</label>
     </div>
     <button class="btn btn-primary w-100 py-2" type="submit">Iniciar sesión</button>
+    {% if error %}
+  <div class="alert alert-danger mt-2" role="alert">
+    {{ error }}
+  </div>
+  {% endif %}
     <p class="mt-5 mb-3 text-body-secondary">Interfaz para el usuario</p>
   </form>
 {% endblock %}
