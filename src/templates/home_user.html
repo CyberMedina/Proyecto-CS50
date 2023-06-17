@@ -3,55 +3,56 @@
 {% block title%}Inicio{% endblock %}
 
 {% block customCSS %}
+<link rel="stylesheet" href="">
 {% endblock %}
 
 
 {% block buttons %}
-<div class="col-xs-4 col-md-3 col-lg-2">
-    <div class="flex-shrink-0 dropdown m-5">
-      <a href="#" class="d-block link-dark text-decoration-none dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
-        <img src="{{ url_for('static', filename='candelaicono.webp')}}" alt="mdo" width="42" height="42" class="rounded-circle">
-      </a>
-      <ul class="dropdown-menu shadow p-10">
-        <li><a class="dropdown-item ml-3" href="#">Mi perfil</a></li>
-        <li><a class="dropdown-item" href="#">Configuración</a></li>
-        <li>
-          <hr class="dropdown-divider">
-        </li>
-        <li><a class="dropdown-item" href="{{ url_for('CerrarSesion') }}">Cerrar Sesión</a></li>
-      </ul>
-    </div>
-  </div>
+
+</div>
+
 {% endblock %}
+
+{% block sesionbutton %}
+<a class="dropdown-item" href="{{ url_for('editar_usuario') }}">Mi perfil</a>
+<a class="dropdown-item" href="{{ url_for('CerrarSesion') }}">Cerrar Sesión</a>
+{% endblock %}
+
 {% block body %}
-<!-- Modal -->
-<div class="modal" id="iniciosesion">
+<!-- Modal para inicio de usuario redirigdo a home_user -->
+<form class="modal" id="iniciosesion" tabindex="-1" action="/login_usuario" method="POST">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">Inicio de sesión</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                    id="closeModal"></button>
             </div>
             <div class="modal-body">
                 <form class="form-signin text-center" action="/home" method="POST">
-                    <!-- <img class="mb-4" src="{{ url_for('static', filename='img/como.jpg') }}" alt="" width="100"
-                        height="100"> -->
-                    <!-- <h1 class="h3 mb-3 fw-normal">Inicio de sesión</h1> -->
 
                     <div class="form-floating">
-                        <input type="text" class="form-control" id="correo" name="correo"
-                            placeholder="Correo eléctronico">
+                        <input type="email" class="form-control" id="correo" name="correo"
+                            placeholder="Correo eléctronico" required>
                         <label for="floatingInput">Correo electronico</label>
                     </div>
                     <div class="form-floating mb-3">
                         <input type="password" class="form-control" id="contraseña" name="contraseña"
-                            placeholder="contraseña">
+                            placeholder="contraseña" required>
                         <label for="floatingPassword">Contraseña</label>
                     </div>
                     <div class="row mt-2">
                         <button class="btn btn-primary w-100 py-2" type="submit">Iniciar sesión</button>
                     </div>
                     {% if error %}
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            console.log('ala')
+                            const myModal = new bootstrap.Modal(document.getElementById('iniciosesion'));
+                            //const myModal = document.getElementById('iniciosesion')
+                            myModal.show();
+                        })
+                    </script>
                     <div class="alert alert-danger mt-2" role="alert">
                         {{ error }}
                     </div>
@@ -60,9 +61,52 @@
             </div>
         </div>
     </div>
-</div>
+</form>
+
+<!-- Modal para inicio de usuario redirigdo a reservas -->
+<form class="modal" id="iniciosesion2" tabindex="-1" action="/login_usuario2" method="POST">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Inicio de sesión</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"
+                    id="closeModal"></button>
+            </div>
+            <div class="modal-body">
+                <form class="form-signin text-center" action="/home" method="POST">
+
+                    <div class="form-floating">
+                        <input type="email" class="form-control" id="correo" name="correo"
+                            placeholder="Correo eléctronico" required>
+                        <label for="floatingInput">Correo electronico</label>
+                    </div>
+                    <div class="form-floating mb-3">
+                        <input type="password" class="form-control" id="contraseña" name="contraseña"
+                            placeholder="contraseña" required>
+                        <label for="floatingPassword">Contraseña</label>
+                    </div>
+                    <div class="row mt-2">
+                        <button class="btn btn-primary w-100 py-2" type="submit">Iniciar sesión</button>
+                    </div>
+                    {% if error %}
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                            console.log('ala')
+                            const myModal = new bootstrap.Modal(document.getElementById('iniciosesion2'));
+                            myModal.show();
+                        })
+                    </script>
+                    <div class="alert alert-danger mt-2" role="alert">
+                        {{ error }}
+                    </div>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+</form>
 <!-- Carousel Start -->
-<div class="container-fluid p-0">
+<div class="container-fluid p-0 pt-5">
     <div id="header-carousel" class="carousel slide" data-ride="carousel">
         <div class="carousel-inner">
             <div class="carousel-item active">
@@ -491,5 +535,7 @@
 {% endblock %}
 
 {% block customJS %}
-<script src="{{ url_for('static', filename='js/main.js')}}"></script>
+
+
+
 {% endblock %}

@@ -1,11 +1,11 @@
-from flask import Flask, render_template, request, session, redirect, url_for, flash
+from flask import Flask, render_template, request, session, redirect, url_for
 from flask_session import Session
 from flask_mysqldb import MySQL, MySQLdb
 import mysql.connector
-from tempfile import mkdtemp
 from werkzeug.security import check_password_hash, generate_password_hash
-
-from helpers import apology, login_requiredColaborador, login_requiredCliente
+from helpers import login_requiredColaborador, login_requiredCliente, login_requiredCliente2, nologin_requiredCliente
+from urllib.parse import urlencode #Dependencia utilizada para redirigir al modal de inicio de sesión
+import urllib.parse #
 
 from config import config
 
@@ -17,7 +17,7 @@ app.config["TEMPLATES_AUTO_RELOAD"] = True
 #Conexión a la base de datos medinate el conector de mysql y también se conecta a la base de datos en línea
 def connectionBD():
     db = mysql.connector.connect(
-        host="proyectocs50.mysql.database.azure.com",
+        host="proyectocs501.mysql.database.azure.com",
         user="localhost",
         password="cjs-1234",
         database="proyectocs50"
@@ -40,6 +40,7 @@ def after_request(response):
 
 #ruta de inicio de la aplicación
 @app.route('/')
+@nologin_requiredCliente
 def index():
     return render_template('home.html')
 
@@ -86,38 +87,73 @@ def login_usuario():
 
         if not email or not password:
             error = "Debes completar todos los campos para continuar."
-            return render_template('/auth/login_usuario.html', error=error)
+            return render_template('/home.html', error=error)
 
-        # Verify credentials in the database
+        # Verifica las credenciales en la base de datos
         db = connectionBD()
         cursor = db.cursor(dictionary=True)
         cursor.execute('SELECT * FROM usuarios WHERE correo = %s', (email,))
         user_row = cursor.fetchone()
 
         if user_row and check_password_hash(user_row['contraseña'], password):
-            # If credentials are valid, log in the user
+            # Si las credenciales son validas, el cliente se loguea
             session['user_id'] = user_row['user_id']
             session['name'] = user_row['nombres']
             print("Inicio de sesión exitoso")
-            return redirect(url_for('dashboard_colaborador'))
+            return redirect(url_for('home_user'))
         else:
-            # If credentials are invalid, show an error message
+            # Si las credenciales son invalidas, se envía un mensaje de error
             error = "Las credenciales ingresadas no son válidas. Por favor, inténtalo de nuevo."
             print("Ocurrió un error chele")
-            return render_template('/auth/login_usuario.html', error=error)
+            return render_template('/home.html', error=error)
             cursor.close()
-    # If accessing the login page for the first time or GET request, show the login form
-    return render_template('/auth/login_usuario.html')
+    # Si entrea a la ruta del login_usuario este renderiza la plantilla
+
+    return render_template('/home.html')
 
 
-#ruta para el dashboard de los usuarios del sistema con restricción de acceso con inicio de sesión
+#inicio de sesión para los clientes que lleva hacia reservas
+@app.route('/login_usuario2', methods=['GET', 'POST'])
+def login_usuario2():
+    if request.method == 'POST':
+        email = request.form['correo']
+        password = request.form['contraseña']
+
+        if not email or not password:
+            error = "Debes completar todos los campos para continuar."
+            return render_template('/home.html', error=error)
+
+        # Verifica las credenciales en la base de datos
+        db = connectionBD()
+        cursor = db.cursor(dictionary=True)
+        cursor.execute('SELECT * FROM usuarios WHERE correo = %s', (email,))
+        user_row = cursor.fetchone()
+
+        if user_row and check_password_hash(user_row['contraseña'], password):
+            # Si las credenciales son validas, el cliente se loguea
+            session['user_id'] = user_row['user_id']
+            session['name'] = user_row['nombres']
+            print("Inicio de sesión exitoso")
+            return redirect(url_for('reserva'))
+        else:
+            # Si las credenciales son invalidas, se envía un mensaje de error
+            error = "Las credenciales ingresadas no son válidas. Por favor, inténtalo de nuevo."
+            print("Ocurrió un error chele")
+            return render_template('/home.html', error=error)
+            cursor.close()
+    # Si entrea a la ruta del login_usuario este renderiza la plantilla
+    error2 = session.pop('error2', None)  # Obtiene el mensaje de error de la sesión y lo elimina
+    return render_template('/home.html', error2=error2)
+
+
+#ruta para el dashboard del colaborador
 @app.route('/dashboard_colaborador')
 @login_requiredColaborador
 def dashboard_colaborador():
     return render_template('dashboardcolaborador.html')
 
 
-#Registro de usuarios para los clientes
+# Ruta para el registro de usuario
 @app.route('/registro_usuario', methods=['GET', 'POST'])
 def registro_usuario():
     if request.method == "POST":
@@ -139,12 +175,17 @@ def registro_usuario():
         cursor = db.cursor(dictionary=True)
         cursor.execute('SELECT * FROM usuarios WHERE correo = %s', (correo,))
         user_row = cursor.fetchone()
-        cursor.close()
+        #cursor.close()
 
 
 
-        if request.form.get("contraseña") != confirmacion:  
-            return apology("Passwords don't match", 403)
+        if request.form.get("contraseña") != confirmacion:
+            error = "Las contraseñas no son iguales."  
+            return render_template('auth/registro_usuario.html', error=error)
+        
+        elif user_row:
+            error = "El correo ya se encuentra registrado."
+            return render_template('auth/registro_usuario.html', error=error)
 
         db = connectionBD()
         cursor = db.cursor()
@@ -152,26 +193,55 @@ def registro_usuario():
         db.commit()
         cursor.close()
 
-        msg = "Registro exitoso!"
-        return render_template('auth/login_usuario.html', msg=msg)  
-
+        modal_params = {'modal': 'true'}
+        modal_url = "/login_usuario?" + urlencode(modal_params)
+        return redirect(modal_url)
     return render_template('auth/registro_usuario.html')
 
 
-#Ruta para la reserva, con restricción de acceso con inicio de sesión de clientes
-@app.route('/reserva')
-@login_requiredCliente
+
+
+
+@app.route('/reserva', methods=['GET', 'POST'])
+@login_requiredCliente2
 def reserva():
-    return render_template('reserva.html')
+    user_is_logged_in = True
+    if request.method == "POST":
+        cantperson = request.form.get("cantperson")
+        fecha = request.form.get("fecha")
+        hora = request.form.get("hora")
+        estancia = 2.00
 
+        db = connectionBD()
+        cursor = db.cursor()
+        cursor.execute("insert into reservas(cantperson, hora, estancia, fecha) VALUES(%s,%s,%s,%s)",(cantperson,hora,estancia, fecha))  # Corregido: añadir correo al INSERT
+        db.commit()
+        cursor.close()
+        return redirect("finreserva.html")
+     
+    return render_template('reserva.html', user_is_logged_in=user_is_logged_in)
 
-#Ruta de la landing page sin los botones de inicio de sesión, una vez que el usuario se ha logueado
+#fin reserva
+# @app.route('/finreserva')
+# @login_requiredCliente2
+# def finreserva():
+    # user_is_logged_in = True
+    #return render_template('finreserva.html', user_is_logged_in=user_is_logged_in)
+   
+
+# Ruta que renderiza la plantilla de inicio, pero esta vez con el icono del usuario
 @app.route('/home_user')
 @login_requiredCliente
+@login_requiredColaborador
 def home_user():
     return render_template('home_user.html')
 
-# Proceso de cierre de sesión
+@app.route('/editar_usuario')
+@login_requiredCliente
+def editar_usuario():
+    return render_template('auth/editar_usuario.html')
+
+# Ruta para cerrar sesión usuario
 @app.route('/Cerrar_Sesion')
 def CerrarSesion():
     # Clear session variables
@@ -179,6 +249,15 @@ def CerrarSesion():
     session.pop('name', None)
     print("Sesión cerrada exitosamente")
     return redirect(url_for('index'))
+
+# Ruta para cerrar sesión colaborador
+@app.route('/Cerrar_Sesion_Colaborador')
+def CerrarSesionColaborador():
+    # Clear session variables
+    session.pop('user_id', None)
+    session.pop('name', None)
+    print("Sesión cerrada exitosamente")
+    return redirect(url_for('login_colaborador'))
 
 
 if __name__=='__main__':

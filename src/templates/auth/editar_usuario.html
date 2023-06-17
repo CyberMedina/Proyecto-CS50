@@ -1,18 +1,26 @@
 {% extends './base.html'%}
 
-{% block title%}Registro{% endblock %}
+{% block title%}Editar Usuario{% endblock %}
 
 {% block customCSS %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/register.css')}}">
 {% endblock %}
 
+{% block buttons %}
+<div class="col-lg-6 text-center text-lg-right">
+    <div class="d-inline-flex align-items-center mt-2">
 
-{% block sesionbutton %}
-<a class="dropdown-item" href="#iniciosesion" id="modalNew" data-toggle="modal" data-target="#iniciosesion">Iniciar
-  sesión</a>
-<a class="dropdown-item" href="{{ url_for('registro_usuario') }}">Registrarse</a>
+
+        <!-- <a href="{{ url_for('login_usuario') }}" class="btn btn-outline-dark me-2">Iniciar Sesión</a> -->
+    </div>
+</div>
+
 {% endblock %}
 
+{% block sesionbutton %}
+<a class="dropdown-item" href="{{ url_for('editar_usuario') }}">Mi perfil</a>
+<a class="dropdown-item" href="{{ url_for('CerrarSesion') }}">Cerrar Sesión</a>
+{% endblock %}
 
 
 {% block body %}
@@ -22,55 +30,54 @@
       <div class="col">
         <div class="card card-registration my-4">
           <div class="row g-0">
-            <div class="col-lg-6" style="min-height: 500px;">
-              <div class="position-relative h-100">
-                  <img class="position-absolute w-100 h-100"
-                      src="{{url_for('static', filename='img/imregister.jpg')}}" style="object-fit: cover;">
-              </div>
-          </div>
+            <div class="col-xl-6 d-none d-xl-block">
+              <img src="{{url_for('static', filename='img/imregister.jpg')}}" alt="Sample photo" class="img-fluid" id="registration-image"
+                 />
+            </div>
             <div class="col-xl-6">
               <div class="card-body p-md-5 text-black">
-                <h3 class="mb-5 text-uppercase">Registro de usuario</h3>
+                <h3 class="mb-5 text-uppercase">Editar datos del perfil</h3>
                 <div class="row">
                   <div class="col-md-6 mb-4">
-                    <div class="form-group">
-                      <label for="nombres" class="form-label">Nombres</label>
-                      <input type="text" id="nombres" name="nombres" class="form-control form-control-lg" required/>
+                    <div class="form-outline">
+                      <input type="text" id="nombres" name="nombres" class="form-control form-control-lg"  required/>
+                      <label class="form-label" for="form3Example1m">Nombres</label>
                     </div>
                   </div>
                   <div class="col-md-6 mb-4">
-                    <div class="form-group">
-                      <label for="apellidos" class="form-label">Apellidos</label>
+                    <div class="form-outline">
                       <input type="text" id="apellidos" name="apellidos" class="form-control form-control-lg" required/>
+                      <label class="form-label" for="form3Example1n">Apellidos</label>
                     </div>
                   </div>
                 </div>
-                <div class="form-group mb-4">
-                  <label for="cedula" class="form-label">Cédula</label>
+                <div class="form-outline mb-4">
                   <input type="text" id="cedula" name="cedula" class="form-control form-control-lg" pattern="[0-9]{3}-[0-9]{6}-[0-9]{4}[A-Za-z]?" placeholder="001-010101-0001A" required/>
+                  <label class="form-label" for="form3Example8">Cédula</label>
                 </div>
-                <div class="form-group mb-4">
-                  <label for="correo" class="form-label">Correo eléctronico</label>
+                <div class="form-outline mb-4">
                   <input type="email" id="correo" name="correo" class="form-control form-control-lg" required/>
+                  <label class="form-label" for="form3Example8">Correo eléctronico</label>
                 </div>
                 <div class="row">
                   <div class="col-md-6 mb-4">
-                    <div class="form-group">
-                      <label for="contraseña" class="form-label">Contraseña</label>
-                      <input type="password" id="contraseña" name="contraseña" class="form-control form-control-lg" required/>
+                    <div class="form-outline">
+                      <input type="password" id="contraseña" name="contraseña" name="contraseña"
+                        class="form-control form-control-lg" required/>
+                      <label class="form-label" for="form3Example1m1">Contraseña</label>
                     </div>
                   </div>
                   <div class="col-md-6 mb-4">
-                    <div class="form-group">
-                      <label for="repetir" class="form-label">Repetir contraseña</label>
+                    <div class="form-outline">
                       <input type="password" id="repetir" name="repetir" class="form-control form-control-lg" required/>
+                      <label class="form-label" for="form3Example1n1">Repetir contraseña</label>
                     </div>
                   </div>
                 </div>
                 <div class="col-md-6 mb-4">
-                  <div class="form-group">
-                    <label for="telefono" class="form-label">Teléfono</label>
-                    <input type="text" id="telefono" name="telefono" class="form-control form-control-lg" pattern="[0-9]{8}" placeholder="8888-1234" required/>
+                  <div class="form-outline">
+                    <input type="text" id="telefono" name="telefono" class="form-control form-control-lg" pattern="[0-9]{8}" placeholder="75489685" required/>
+                    <label class="form-label" for="form3Example8">Teléfono</label>
                   </div>
                 </div>
                 <div class="d-flex justify-content-end pt-3">
@@ -88,4 +95,5 @@
       </div>
     </div>
   </div>
+
 {% endblock %}
