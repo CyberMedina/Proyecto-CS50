@@ -304,20 +304,12 @@
     <div class="row justify-content-center mt-0">
         <div class="col-11 col-sm-9 col-md-7 col-lg-6 text-center p-0 mt-3 mb-2">
             <div class="card px-0 pt-4 pb-0 mt-3 mb-3">
-                <h2><strong>Proceso de reserva</strong></h2>
                 <div class="row">
                     <div class="col-md-12 mx-0">
                         <form id="msform" method="POST" action="/reserva">
-                            <!-- progressbar -->
-                            <ul id="progressbar">
-                                <li class="active" id="account"><strong>Datos</strong></li>
-                                <li id="personal"><strong>Reserva</strong></li>
-                                <li id="payment"><strong>Confirmación</strong></li>
-                                <li id="confirm"><strong>Fin</strong></li>
-                            </ul>
                             <fieldset>
                                 <div class="form-card">
-                                    <h2 class="fs-title text-center">¡Solicitud de reserva enviada!</h2>
+                                    <h2 class="fs-title text-center">Oops, tienes una solicitud de reserva pendiente</h2>
                                     <br><br>
                                     <div class="row justify-content-center">
                                         <div class="col-3">
@@ -328,7 +320,7 @@
                                     <br><br>
                                     <div class="row justify-content-center">
                                         <div class="col-7 text-center">
-                                            <p>Te estaremos enviando un correo eléctronico confirmando tu reserva al
+                                            <p>Estimad@ <b>{{ nombre }}</b> espera que tú solicitud sea respondida para poder realizar otra reserva. Estate atento al siguiente correo:</p>  
                                                 <b>{{ correo }}</b>
                                             </p>
                                             <h5></h5>

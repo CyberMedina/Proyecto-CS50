@@ -3,7 +3,7 @@
 {% block title%}Inicio{% endblock %}
 
 {% block customCSS %}
-<link rel="stylesheet" href="">
+<link rel="stylesheet" href="{{ url_for('static', filename = 'css/home.css')}}">
 {% endblock %}
 
 
@@ -34,20 +34,19 @@
             <div class="modal-body">
                 <form class="form-signin text-center" action="/login_usuario" method="POST">
                     <div class="form-group">
-                        <label for="correo">Correo electrónico</label>
-                        <input type="text" class="form-control" id="correo" name="correo"
-                            placeholder="Correo electrónico" required>
+                        <label class="" for="correo" style="display: block; text-align: left;">Correo
+                            electrónico</label>
+                        <input type="text" class="form-control" id="correo" name="correo" required>
                     </div>
                     <div class="form-group">
-                        <label for="contraseña">Contraseña</label>
-                        <input type="password" class="form-control" id="contraseña" name="contraseña"
-                            placeholder="Contraseña" required>
+                        <label class="" for="contraseña" style="display: block; text-align: left;">Contraseña </label>
+                        <input type="password" class="form-control" id="contraseña" name="contraseña" required>
                     </div>
                     <button class="btn btn-primary btn-sm btn-block" type="submit">Iniciar sesión</button>
                     {% if error %}
                     <script>
                         document.addEventListener('DOMContentLoaded', function () {
-                    
+
                             const myModal = new bootstrap.Modal(document.getElementById('iniciosesion'));
                             myModal.show();
                         })
@@ -77,20 +76,20 @@
             <div class="modal-body">
                 <form class="form-signin text-center" action="/login_usuario2" method="POST">
                     <div class="form-group">
-                        <label for="correo">Correo electrónico</label>
+                        <label for="correo" style="display: block; text-align: left;">Correo electrónico</label>
                         <input type="text" class="form-control" id="correo" name="correo"
-                            placeholder="Correo electrónico" required>
+                            required>
                     </div>
                     <div class="form-group">
-                        <label for="contraseña">Contraseña</label>
+                        <label for="contraseña" style="display: block; text-align: left;">Contraseña</label>
                         <input type="password" class="form-control" id="contraseña" name="contraseña"
-                            placeholder="Contraseña" required>
+                           required>
                     </div>
                     <button class="btn btn-primary btn-block" type="submit">Iniciar sesión</button>
                     {% if error %}
                     <script>
                         document.addEventListener('DOMContentLoaded', function () {
-                    
+
                             const myModal = new bootstrap.Modal(document.getElementById('iniciosesion2'));
                             myModal.show();
                         })
@@ -103,7 +102,7 @@
                     {% if error2 %}
                     <script>
                         document.addEventListener('DOMContentLoaded', function () {
-                    
+
                             const myModal = new bootstrap.Modal(document.getElementById('iniciosesion2'));
                             myModal.show();
                         })
@@ -132,6 +131,10 @@
                     <div class="p-3" style="max-width: 900px;">
                         <h4 class="text-white text-uppercase mb-md-3">CJS</h4>
                         <h1 class="display-3 text-white mb-md-4">Comer con tus amigos sabe mejor</h1>
+                        <div class="card-body rounded-bottom mt-4">
+                            <a href="{{ url_for('reserva') }}" class="btn btn-block py-3 border-10"
+                                type="submit">¡Reserva ya!</a>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -141,6 +144,10 @@
                     <div class="p-3" style="max-width: 900px;">
                         <h4 class="text-white text-uppercase mb-md-3">CJS</h4>
                         <h1 class="display-3 text-white mb-md-4">Comer con la familia siempre es mejor</h1>
+                        <div class="card-body rounded-bottom mt-4">
+                            <a href="{{ url_for('reserva') }}" class="btn btn-block py-3 border-10"
+                                type="submit">¡Reserva ya!</a>
+                        </div>
                     </div>
                 </div>
             </div>

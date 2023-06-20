@@ -3,26 +3,18 @@ from flask_session import Session
 from flask_mysqldb import MySQL, MySQLdb
 import mysql.connector
 from werkzeug.security import check_password_hash, generate_password_hash
-from helpers import login_requiredColaborador, login_requiredCliente, login_requiredCliente2, nologin_requiredCliente
+from helpers import login_requiredColaborador, login_requiredCliente, login_requiredCliente2, nologin_requiredCliente, check_reservas
 from urllib.parse import urlencode #Dependencia utilizada para redirigir al modal de inicio de sesión
 import urllib.parse #
+from config import connectionBD
 
-from config import config
 
 app=Flask(__name__)
 
 #Actualiza el proyecto al realizar modificaciones en el HTML en la carpeta templates
 app.config["TEMPLATES_AUTO_RELOAD"] = True
 
-#Conexión a la base de datos medinate el conector de mysql y también se conecta a la base de datos en línea
-def connectionBD():
-    db = mysql.connector.connect(
-        host="proyectocs501.mysql.database.azure.com",
-        user="localhost",
-        password="cjs-1234",
-        database="proyectocs50"
-    )
-    return db
+
 
 #Esta es una forma de almacenar la información del usuario en el servidor para luego ser utilizada en la aplicación
 app.config["SESSION_PERMANENT"] = False #Configura la sesion para que no sea permanente y se cierre cuando se cierre el navegador
@@ -65,9 +57,9 @@ def login_colaborador():
 
         if user_row and check_password_hash(user_row['contraseña'], password):
             # Si las credenciales son validas, el colaborador se loguea
-            session['user_id'] = user_row['user_id']
+            session['usersis_id'] = user_row['usersis_id']
             session['name'] = user_row['nombres']
-            session['rol'] = user_row['rol']
+            session['id_rol'] = user_row['id_rol']
             return redirect(url_for('dashboard_colaborador'))
         else:
             # Si las credenciales son invalidas, se envía un mensaje de error
@@ -98,7 +90,11 @@ def login_usuario():
         if user_row and check_password_hash(user_row['contraseña'], password):
             # Si las credenciales son validas, el cliente se loguea
             session['user_id'] = user_row['user_id']
-            session['name'] = user_row['nombres']
+            session['cedula'] = user_row['cedula']
+            session['nombres'] = user_row['nombres']
+            session['apellidos'] = user_row['apellidos']
+            session['correo'] = user_row['correo']
+            session['telefono'] = user_row['telefono']
             print("Inicio de sesión exitoso")
             return redirect(url_for('home_user'))
         else:
@@ -132,7 +128,11 @@ def login_usuario2():
         if user_row and check_password_hash(user_row['contraseña'], password):
             # Si las credenciales son validas, el cliente se loguea
             session['user_id'] = user_row['user_id']
-            session['name'] = user_row['nombres']
+            session['cedula'] = user_row['cedula']
+            session['nombres'] = user_row['nombres']
+            session['apellidos'] = user_row['apellidos']
+            session['correo'] = user_row['correo']
+            session['telefono'] = user_row['telefono']
             print("Inicio de sesión exitoso")
             return redirect(url_for('reserva'))
         else:
@@ -204,35 +204,53 @@ def registro_usuario():
 
 @app.route('/reserva', methods=['GET', 'POST'])
 @login_requiredCliente2
+@check_reservas
 def reserva():
     user_is_logged_in = True
+    user_data = {
+        'cedula': session.get('cedula'),
+        'nombres': session.get('nombres'),
+        'apellidos': session.get('apellidos'),
+        'correo': session.get('correo'),
+        'telefono': session.get('telefono')
+    }
+
     if request.method == "POST":
+
         cantperson = request.form.get("cantperson")
         fecha = request.form.get("fecha")
         hora = request.form.get("hora")
         estancia = 2.00
+        estado = 0
 
+        # Realizar la inserción en la base de datos utilizando los datos de la sesión
         db = connectionBD()
         cursor = db.cursor()
-        cursor.execute("insert into reservas(cantperson, hora, estancia, fecha) VALUES(%s,%s,%s,%s)",(cantperson,hora,estancia, fecha))  # Corregido: añadir correo al INSERT
+        cursor.execute("INSERT INTO reservas (user_id, cantperson, hora, estancia, fecha, estado) VALUES (%s, %s, %s, %s, %s, %s)", (session['user_id'], cantperson, hora, estancia, fecha, estado))
         db.commit()
         cursor.close()
-        return redirect("finreserva.html")
-     
-    return render_template('reserva.html', user_is_logged_in=user_is_logged_in)
+        return redirect(url_for('finreserva'))
+
+        
+
+
+    return render_template('reserva.html', user_is_logged_in=user_is_logged_in, user_data=user_data)
+
 
 #fin reserva
-# @app.route('/finreserva')
-# @login_requiredCliente2
-# def finreserva():
-    # user_is_logged_in = True
-    #return render_template('finreserva.html', user_is_logged_in=user_is_logged_in)
-   
+@app.route('/finreserva', methods=['GET', 'POST'])
+@login_requiredCliente2
+def finreserva():
+    return render_template('finreserva.html', correo=session['correo'])
+
+@app.route('/checkreserva', methods=['GET', 'POST'])
+@login_requiredCliente2
+def checkreserva():
+    return render_template('checkreserva.html', correo=session['correo'], nombre=session['nombres'])
 
 # Ruta que renderiza la plantilla de inicio, pero esta vez con el icono del usuario
 @app.route('/home_user')
 @login_requiredCliente
-@login_requiredColaborador
 def home_user():
     return render_template('home_user.html')
 
@@ -261,5 +279,4 @@ def CerrarSesionColaborador():
 
 
 if __name__=='__main__':
-    app.config.from_object(config['development'])
     app.run()

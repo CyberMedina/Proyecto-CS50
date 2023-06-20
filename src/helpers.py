@@ -1,7 +1,8 @@
 from functools import wraps
 from flask import session, redirect, url_for, session
 from urllib.parse import urlencode #Dependencia utilizada para redirigir al modal de inicio de sesión
-import urllib.parse #
+import urllib.parse 
+from config import connectionBD
 
 #Validación para el inicio de sesión de colaborador
 def login_requiredColaborador(f):
@@ -52,10 +53,28 @@ def nologin_requiredCliente(f):
 def login_requiredColaborador(f):
     @wraps(f)
     def decorated_function(*args, **kwargs):
-        if session.get("user_id") is None:
+        if session.get("usersis_id") is None:
             return redirect("/login_colaborador")
         return f(*args, **kwargs)
     return decorated_function
+
+def check_reservas(f):
+    @wraps(f)
+    def decorated_function(*args, **kwargs):
+        # Realizar la consulta en la base de datos
+        db = connectionBD()
+        cursor = db.cursor(dictionary=True)
+        cursor.execute('SELECT COUNT(*) AS count_reservas FROM reservas WHERE user_id = %s AND estado = 0', (session['user_id'],))
+        result = cursor.fetchone()
+        cursor.close()
+
+        # Verificar si el usuario tiene reservas con estado > 0
+        if result['count_reservas'] > 0:
+            # Si el usuario tiene reservas, redireccionar a una página de error o mostrar un mensaje de error
+            return redirect('/checkreserva')
+        return f(*args, **kwargs)
+    return decorated_function
+
 
 
 
