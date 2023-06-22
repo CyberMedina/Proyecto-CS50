@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, session, redirect, url_for
 from flask_session import Session
+from datetime import datetime
 from flask_mysqldb import MySQL, MySQLdb
 import mysql.connector
 from werkzeug.security import check_password_hash, generate_password_hash
@@ -7,9 +8,42 @@ from helpers import login_requiredColaborador, login_requiredCliente, login_requ
 from urllib.parse import urlencode #Dependencia utilizada para redirigir al modal de inicio de sesión
 import urllib.parse #
 from config import connectionBD
+from flask import Flask
+from flask_mail import Mail, Message
+from flask import Flask, g #Con esto podemos tener una variable global para poder ser usadas nuestros HTML con jinja 
+
+
 
 
 app=Flask(__name__)
+
+app.jinja_env.globals['g'] = g #Se instancia la variable global para ser usada en jinja
+
+#No puuede ser cambiada esta función, ya que esta función es una palabra reservada
+@app.before_request
+def before_request():
+    if 'usersis_id' in session:
+        db = connectionBD()
+        cursor = db.cursor(dictionary=True)
+        cursor.execute('SELECT us.usersis_id, us.nombres, us.apellidos, r.rolname FROM usuarios_sistema us JOIN rol r ON us.id_rol = r.id_rol WHERE us.usersis_id = %s', (session['usersis_id'],))
+        user_row = cursor.fetchone()
+        cursor.close()
+
+        g.id_rol = session['usersis_id']
+        g.nombres = user_row['nombres']
+        g.apellidos = user_row['apellidos']
+        g.rolname = user_row['rolname']
+
+
+# Configuración de Flask-Mail
+app.config['MAIL_SERVER'] = 'smtp.gmail.com'
+app.config['MAIL_PORT'] = 587
+app.config['MAIL_USE_TLS'] = True
+app.config['MAIL_USERNAME'] = 'elgustocj@gmail.com'
+app.config['MAIL_PASSWORD'] = 'jeijrzfqlxwmsuhw'
+app.config['MAIL_DEFAULT_SENDER'] = 'elgustocj@gmail.com'
+
+mail = Mail(app)
 
 #Actualiza el proyecto al realizar modificaciones en el HTML en la carpeta templates
 app.config["TEMPLATES_AUTO_RELOAD"] = True
@@ -104,8 +138,12 @@ def login_usuario():
             return render_template('/home.html', error=error)
             cursor.close()
     # Si entrea a la ruta del login_usuario este renderiza la plantilla
-
-    return render_template('/home.html')
+    #Función para abrir un modal en especifico al recargar el html y con el id del modal
+    modal_id = "iniciosesion2"  # ID del modal que deseas abrir
+    modal_params = {"modal": "true", "modal_id": modal_id,}
+    modal_url = url_for('login_usuario2') + '?' + urlencode(modal_params)
+    
+    return redirect(modal_url)
 
 
 #inicio de sesión para los clientes que lleva hacia reservas
@@ -150,12 +188,16 @@ def login_usuario2():
 @app.route('/dashboard_colaborador')
 @login_requiredColaborador
 def dashboard_colaborador():
+
+    
+    
     return render_template('dashboardcolaborador.html')
 
 
 # Ruta para el registro de usuario
 @app.route('/registro_usuario', methods=['GET', 'POST'])
 def registro_usuario():
+    error = None
     if request.method == "POST":
         nombres = request.form.get("nombres")
         apellidos = request.form.get("apellidos")
@@ -168,35 +210,34 @@ def registro_usuario():
         # Validar campos en blanco
         if not nombres or not apellidos or not cedula or not correo or not contraseña or not confirmacion or not telefono:
             error = "Debes completar todos los campos para registrarte."
-            return render_template('auth/registro_usuario.html', error=error)
+            return render_template('auth/registro_usuario.html', error=error, nombres=nombres, apellidos=apellidos, cedula=cedula, correo=correo, telefono=telefono)
 
 
         db = connectionBD()
         cursor = db.cursor(dictionary=True)
         cursor.execute('SELECT * FROM usuarios WHERE correo = %s', (correo,))
         user_row = cursor.fetchone()
-        #cursor.close()
-
-
 
         if request.form.get("contraseña") != confirmacion:
             error = "Las contraseñas no son iguales."  
-            return render_template('auth/registro_usuario.html', error=error)
+            return render_template('auth/registro_usuario.html', error=error, nombres=nombres, apellidos=apellidos, cedula=cedula, correo=correo, telefono=telefono)
         
         elif user_row:
             error = "El correo ya se encuentra registrado."
-            return render_template('auth/registro_usuario.html', error=error)
+            return render_template('auth/registro_usuario.html', error=error, nombres=nombres, apellidos=apellidos, cedula=cedula, telefono=telefono)
 
         db = connectionBD()
         cursor = db.cursor()
-        cursor.execute("INSERT INTO usuarios (nombres, apellidos, cedula, correo, contraseña, telefono) VALUES (%s, %s, %s, %s, %s, %s)", (nombres, apellidos, cedula, correo, contraseña, telefono))  # Corregido: añadir correo al INSERT
+        cursor.execute("INSERT INTO usuarios (nombres, apellidos, cedula, correo, contraseña, telefono) VALUES (%s, %s, %s, %s, %s, %s)", (nombres, apellidos, cedula, correo, contraseña, telefono))
         db.commit()
         cursor.close()
 
         modal_params = {'modal': 'true'}
         modal_url = "/login_usuario?" + urlencode(modal_params)
         return redirect(modal_url)
-    return render_template('auth/registro_usuario.html')
+
+    return render_template('auth/registro_usuario.html', error=error)
+
 
 
 
@@ -278,5 +319,136 @@ def CerrarSesionColaborador():
     return redirect(url_for('login_colaborador'))
 
 
+#Vistas y rutas de colaborador de las solicitudes pendiente
+@app.route('/solicitudes_pendientes', methods=['GET', 'POST'])
+@login_requiredColaborador
+def solicitudes_pendientes():
+    # Obtener las solicitudes pendientes de la base de datos
+    db = connectionBD()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT u.user_id, u.nombres, u.apellidos, r.id_reservas, r.cantperson, TIME_FORMAT(r.hora, '%h:%i %p') AS hora, r.estancia, DATE_FORMAT(r.fecha, '%Y-%m-%d') AS fecha, r.estado, DATE_FORMAT(r.registroreserva, '%Y-%m-%d %h:%i %p') AS registroreserva FROM reservas r INNER JOIN usuarios u ON r.user_id = u.user_id WHERE r.estado = 0;")
+    solicitudes = cursor.fetchall()
+    cursor.close()
+
+    if request.method == "POST":
+        return redirect(url_for('gestionsolicitud'), solicitudes=solicitudes, g=g)
+
+
+
+    
+
+    return render_template('solicitudes_pendientes.html', solicitudes=solicitudes, g=g)
+
+# Ruta parar el formulario de rechazo de la solicitud
+@app.route('/rechazo_solicitud/<int:id_reservas>', methods=['GET', 'POST'])
+def rechazo_solicitud(id_reservas):
+
+    if request.method == "POST":
+        motivo_rechazo = request.form.get('motivo_rechazo')
+        
+        if not motivo_rechazo:
+            error_message = "Por favor, ingresa el motivo de rechazo."
+            return render_template('rechazo_solicitud.html', user_row=user_row, error_message=error_message)
+        
+        # Obtener los datos del formulario
+        usersis_id = session['usersis_id'] #User id del usuario actual
+        fecharespuesta = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+        motivo_rechazo = request.form['motivo_rechazo']
+        
+        # Actualizar el estado y realizar la inserción en la base de datos
+        db = connectionBD()
+        cursor = db.cursor()
+        cursor.execute("UPDATE reservas SET estado = 2 WHERE id_reservas = %s", (id_reservas,))
+        cursor.execute("UPDATE reservas SET usersis_id = %s, fecharespuesta = %s, descripcion = %s WHERE id_reservas = %s", (usersis_id, fecharespuesta, motivo_rechazo, id_reservas))
+        db.commit()
+
+        #Haciendo consulta para obtener los datos que se enviaran al correo
+        db = connectionBD()
+        cursor = db.cursor(dictionary=True)
+        cursor.execute("SELECT u.nombres, u.apellidos, u.correo FROM reservas r INNER JOIN usuarios u ON r.user_id = u.user_id WHERE r.id_reservas = %s", (id_reservas,))
+        user_row = cursor.fetchone()
+
+        destinatario=user_row['correo']
+        nombres=user_row['nombres']
+        apellidos=user_row['apellidos']
+
+        # Enviar correo electrónico con el motivo de rechazo
+        enviar_correo_rechazo(destinatario, nombres, apellidos, motivo_rechazo)
+
+        return redirect(url_for('solicitudes_pendientes'))
+    
+
+        
+
+    db = connectionBD()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SET lc_time_names = 'es_ES'")
+    cursor.execute("SELECT u.user_id, u.nombres, u.apellidos, u.cedula, u.correo, u.contraseña, u.telefono, r.id_reservas, r.cantperson, TIME_FORMAT(r.hora, '%h:%i %p') AS hora, r.estancia, DATE_FORMAT(r.fecha, '%W %d de %M de %Y') AS fecha, r.estado, DATE_FORMAT(r.registroreserva, '%Y-%m-%d %h:%i %p') AS registroreserva FROM reservas r INNER JOIN usuarios u ON r.user_id = u.user_id WHERE r.id_reservas = %s", (id_reservas,))
+    user_row = cursor.fetchone()
+
+    
+
+    return render_template('rechazo_solicitud.html', user_row=user_row)
+
+# Función para enviar correo de rechazo
+def enviar_correo_rechazo(destinatario, nombres, apellidos, motivo_rechazo):
+    asunto = 'Rechazo de solicitud de reserva en el restaurante El gusto CJ'
+    cuerpo = f'Estimado/a {nombres} {apellidos} \n\nLamentamos informarte que tu solicitud de reserva en el restaurante ha sido rechazada debido a la siguiente razón:\n\n{motivo_rechazo}\n\nTe agradecemos por tu interés en nuestro restaurante y esperamos poder atenderte en otra ocasión.\n\nSaludos cordiales\nEl gusto CJ'
+    enviar_correo(destinatario, asunto, cuerpo)
+
+# Función genérica para enviar un correo
+def enviar_correo(destinatario, asunto, cuerpo):
+    mensaje = Message(asunto, recipients=[destinatario])
+    mensaje.body = cuerpo
+    mail.send(mensaje)
+
+# Ruta parar el formulario de aceptación de la solicitud
+@app.route('/aceptar_solicitud/<int:id_reservas>', methods=['GET', 'POST'])
+def aceptar_solicitud(id_reservas):
+     
+    if request.method == "POST":
+        return redirect(url_for('solicitudes_pendientes'))
+    
+
+        
+
+    db = connectionBD()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SET lc_time_names = 'es_ES'")
+    cursor.execute("SELECT u.user_id, u.nombres, u.apellidos, u.cedula, u.correo, u.contraseña, u.telefono, r.id_reservas, r.cantperson, TIME_FORMAT(r.hora, '%h:%i %p') AS hora, r.estancia, DATE_FORMAT(r.fecha, '%W %d de %M de %Y') AS fecha, r.estado, DATE_FORMAT(r.registroreserva, '%Y-%m-%d %h:%i %p') AS registroreserva FROM reservas r INNER JOIN usuarios u ON r.user_id = u.user_id WHERE r.id_reservas = %s", (id_reservas,))
+    user_row = cursor.fetchone()
+        
+
+
+
+
+    return render_template('aceptar_solicitud.html', user_row=user_row)
+
+#Solitudes aprobadas
+@app.route('/solicitudes_aprobadas', methods=['GET', 'POST'])
+def solicitudes_aprobadas():
+    # Obtener las solicitudes pendientes de la base de datos
+    db = connectionBD()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT u.user_id, u.nombres, u.apellidos, r.id_reservas, r.cantperson, TIME_FORMAT(r.hora, '%h:%i %p') AS hora, r.estancia, DATE_FORMAT(r.fecha, '%Y-%m-%d') AS fecha, r.estado, DATE_FORMAT(r.registroreserva, '%Y-%m-%d %h:%i %p') AS registroreserva FROM reservas r INNER JOIN usuarios u ON r.user_id = u.user_id WHERE r.estado = 1;")
+    solicitudes = cursor.fetchall()
+    cursor.close()
+
+
+    return render_template('solicitudes_aprobadas.html', solicitudes=solicitudes)
+
+#Solicitudes rechazadas
+@app.route('/solicitudes_rechazadas', methods=['GET', 'POST'])
+def solicitudes_rechazadas():
+    db = connectionBD()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT u.user_id, u.nombres, u.apellidos, r.id_reservas, r.cantperson, TIME_FORMAT(r.hora, '%h:%i %p') AS hora, r.estancia, DATE_FORMAT(r.fecha, '%Y-%m-%d') AS fecha, r.estado, DATE_FORMAT(r.registroreserva, '%Y-%m-%d %h:%i %p') AS registroreserva FROM reservas r INNER JOIN usuarios u ON r.user_id = u.user_id WHERE r.estado = 2;")
+    solicitudes = cursor.fetchall()
+    cursor.close()
+
+
+    return render_template('solicitudes_rechazadas.html', solicitudes=solicitudes)
+
 if __name__=='__main__':
+    app.debug = True
     app.run()

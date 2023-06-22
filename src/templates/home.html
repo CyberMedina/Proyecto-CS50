@@ -21,8 +21,7 @@
 
 {% block body %}
 <!-- Modal para inicio de usuario redirigdo a home_user -->
-<div class="modal fade" id="iniciosesion" tabindex="-1" role="dialog" aria-labelledby="iniciosesionTitle"
-    aria-hidden="true">
+<div class="modal fade" id="iniciosesion" tabindex="-1" role="dialog" aria-labelledby="iniciosesionTitle" aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -34,8 +33,7 @@
             <div class="modal-body">
                 <form class="form-signin text-center" action="/login_usuario" method="POST">
                     <div class="form-group">
-                        <label class="" for="correo" style="display: block; text-align: left;">Correo
-                            electrónico</label>
+                        <label class="" for="correo" style="display: block; text-align: left;">Correo electrónico</label>
                         <input type="text" class="form-control" id="correo" name="correo" required>
                     </div>
                     <div class="form-group">
@@ -46,20 +44,21 @@
                     {% if error %}
                     <script>
                         document.addEventListener('DOMContentLoaded', function () {
-
                             const myModal = new bootstrap.Modal(document.getElementById('iniciosesion'));
                             myModal.show();
-                        })
+                        });
                     </script>
                     <div class="alert alert-danger mt-2" role="alert">
                         {{ error }}
                     </div>
                     {% endif %}
                 </form>
+                <label class="mt-2" style="display: block; text-align: center;">¿No tienes una cuenta? <a href="{{ url_for('registro_usuario') }}">Registrate</a></label>
             </div>
         </div>
     </div>
 </div>
+
 
 
 <!-- Modal para inicio de usuario redirigdo a reservas -->
@@ -86,6 +85,7 @@
                            required>
                     </div>
                     <button class="btn btn-primary btn-block" type="submit">Iniciar sesión</button>
+                    <label class="mt-2" style="display: block; text-align: center;">¿No tienes una cuenta? <a href="{{ url_for('registro_usuario') }}">Registrate</a></label>
                     {% if error %}
                     <script>
                         document.addEventListener('DOMContentLoaded', function () {
@@ -129,7 +129,6 @@
                 <img class="w-100" src="{{ url_for('static', filename='img/fondo.webp') }}" alt="Image">
                 <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
                     <div class="p-3" style="max-width: 900px;">
-                        <h4 class="text-white text-uppercase mb-md-3">CJS</h4>
                         <h1 class="display-3 text-white mb-md-4">Comer con tus amigos sabe mejor</h1>
                         <div class="card-body rounded-bottom mt-4">
                             <a href="{{ url_for('reserva') }}" class="btn btn-block py-3 border-10"
@@ -142,7 +141,6 @@
                 <img class="w-100" src="{{ url_for('static', filename='img/fondo2.jpg') }}" alt="Image">
                 <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
                     <div class="p-3" style="max-width: 900px;">
-                        <h4 class="text-white text-uppercase mb-md-3">CJS</h4>
                         <h1 class="display-3 text-white mb-md-4">Comer con la familia siempre es mejor</h1>
                         <div class="card-body rounded-bottom mt-4">
                             <a href="{{ url_for('reserva') }}" class="btn btn-block py-3 border-10"
@@ -179,7 +177,7 @@
 
             <div class="col-lg-6 pt-5 pb-lg-5">
                 <div class="about-text bg-white p-4 p-lg-5 my-lg-5" id="sobre">
-                    <h6 class="text-primary text-uppercase" style="letter-spacing: 10px;">El GUSTO CJS</h6>
+                    <h6 class="text-primary text-uppercase" style="letter-spacing: 10px;">El GUSTO CJ</h6>
                     <h1 class="mb-3">¡Ofrecemos los mejores platillos de todo el mundo!</h1>
                     <p class="text-justify">Nuestro restaurante es un lugar acogedor y auténtico, donde podrás disfrutar
                         de una amplia
@@ -387,7 +385,7 @@
                     <h1 class="text-white"><span class="text-primary">¡Reserva</span> Ahora mismo!</h1>
                 </div>
                 <p class="text-white">Hacer tu reserva nunca habia sido tan facil y rapido, solo sigue los pasos y
-                    pronto estaras comiendo en <span class="text-primary">EL GUSTO CJS</span> </p>
+                    pronto estaras comiendo en <span class="text-primary">EL GUSTO CJ</span> </p>
                 <ul class="list-inline text-white m-0">
                     <li class="py-2"><i class="fa fa-check text-primary mr-3"></i>Registrate</li>
                     <li class="py-2"><i class="fa fa-check text-primary mr-3"></i>Reserva tu dia</li>
@@ -523,14 +521,14 @@
                 </div>
             </div>
             <div class="text-center">
-                <img class="img-fluid mx-auto" src="{{url_for('static', filename='img/aset.jpg')}}"
+                <img class="img-fluid mx-auto" src="{{url_for('static', filename='img/testimonial-4.jpg')}}"
                     style="width: 100px; height: 100px;">
                 <div class="testimonial-text bg-white p-4 mt-n5">
                     <p class="mt-5">Faltan aspectos que mejorar en el local pero puedo decir que la comida lo
                         compensa, muy buena.
                     </p>
-                    <h5 class="text-truncate">Set Delgado</h5>
-                    <span>Programador</span>
+                    <h5 class="text-truncate">Matias Guadamuz</h5>
+                    <span>Diseñador web</span>
                 </div>
             </div>
             <div class="text-center">

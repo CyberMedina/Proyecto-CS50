@@ -3,7 +3,7 @@
 {% block title%}Registro{% endblock %}
 
 {% block customCSS %}
-<link rel="stylesheet" href="{{ url_for('static', filename='css/register.css')}}">
+<link rel="stylesheet" href="{{ url_for('static', filename = 'css/home.css')}}">
 {% endblock %}
 
 
@@ -35,23 +35,23 @@
                   <div class="col-md-6 mb-4">
                     <div class="form-group">
                       <label for="nombres" class="form-label">Nombres</label>
-                      <input type="text" id="nombres" name="nombres" class="form-control form-control-lg" required/>
+                      <input type="text" id="nombres" name="nombres" class="form-control form-control-lg" value="{{ nombres}}" required/>
                     </div>
                   </div>
                   <div class="col-md-6 mb-4">
                     <div class="form-group">
                       <label for="apellidos" class="form-label">Apellidos</label>
-                      <input type="text" id="apellidos" name="apellidos" class="form-control form-control-lg" required/>
+                      <input type="text" id="apellidos" name="apellidos" class="form-control form-control-lg" value="{{ apellidos }}" required/>
                     </div>
                   </div>
                 </div>
                 <div class="form-group mb-4">
                   <label for="cedula" class="form-label">Cédula</label>
-                  <input type="text" id="cedula" name="cedula" class="form-control form-control-lg" pattern="[0-9]{3}-[0-9]{6}-[0-9]{4}[A-Za-z]?" placeholder="001-010101-0001A" required/>
+                  <input type="text" id="cedula" name="cedula" class="form-control form-control-lg" pattern="[0-9]{3}-[0-9]{6}-[0-9]{4}[A-Za-z]?" placeholder="001-010101-0001A" value="{{ cedula }}" required/>
                 </div>
                 <div class="form-group mb-4">
                   <label for="correo" class="form-label">Correo eléctronico</label>
-                  <input type="email" id="correo" name="correo" class="form-control form-control-lg" required/>
+                  <input type="email" id="correo" name="correo" class="form-control form-control-lg" value="{{ correo }}" required/>
                 </div>
                 <div class="row">
                   <div class="col-md-6 mb-4">
@@ -70,11 +70,12 @@
                 <div class="col-md-6 mb-4">
                   <div class="form-group">
                     <label for="telefono" class="form-label">Teléfono</label>
-                    <input type="text" id="telefono" name="telefono" class="form-control form-control-lg" pattern="[0-9]{8}" placeholder="8888-1234" required/>
+                    <input type="text" id="telefono" name="telefono" class="form-control form-control-lg" pattern="[0-9]{8}" placeholder="8888-1234" value="{{ telefono }}" required/>
                   </div>
                 </div>
                 <div class="d-flex justify-content-end pt-3">
-                  <button type="submit" class="btn btn-warning btn-lg ms-2">Registrarse</button>
+                  <label class="mt-2 pt-3" style="display: block; text-align: center;">¿Ya tienes una cuenta? <a href="{{ url_for('login_usuario') }}"><br>Inicia sesión</a></label>
+                  <button type="submit" class="btn btn-warning btn-lg ms-2 mr-3">Registrarse</button>
                 </div>
                 {% if error %}
                 <div class="alert alert-danger mt-2" role="alert">
