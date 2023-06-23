@@ -331,7 +331,7 @@ def solicitudes_pendientes():
     # Obtener las solicitudes pendientes de la base de datos
     db = connectionBD()
     cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT u.user_id, u.nombres, u.apellidos, r.id_reservas, r.cantperson, TIME_FORMAT(r.hora, '%h:%i %p') AS hora, r.estancia, DATE_FORMAT(r.fecha, '%Y-%m-%d') AS fecha, r.estado, DATE_FORMAT(r.registroreserva, '%Y-%m-%d %h:%i %p') AS registroreserva FROM reservas r INNER JOIN usuarios u ON r.user_id = u.user_id WHERE r.estado = 0;")
+    cursor.execute("SELECT u.user_id, u.nombres, u.apellidos, r.id_reservas, r.cantperson, TIME_FORMAT(r.hora, '%h:%i %p') AS hora, r.estancia, DATE_FORMAT(r.fecha, '%Y-%m-%d') AS fecha, r.estado, DATE_FORMAT(r.registroreserva, '%Y-%m-%d %h:%i %p') AS registroreserva FROM reservas r INNER JOIN usuarios u ON r.user_id = u.user_id WHERE r.estado = 0 ORDER BY r.registroreserva ASC, r.fecha ASC, r.hora ASC;")
     solicitudes = cursor.fetchall()
     cursor.close()
 
@@ -409,7 +409,6 @@ def enviar_correo(destinatario, asunto, cuerpo):
 
 
 
-# Ruta parar el formulario de aceptación de la solicitud
 @app.route('/aceptar_solicitud/<int:id_reservas>', methods=['GET', 'POST'])
 def aceptar_solicitud(id_reservas):
      
@@ -544,11 +543,31 @@ AND (DATE(r.fecha) = DATE(%s))
 
     # cursor.execute("SELECT m.id_mesa, t.max_sillas FROM mesas m INNER JOIN tipomesa t ON m.id_tipmesa = t.id_tipmesa")
     rmesas = cursor.fetchall()
-    
-    
 
+    cursor.execute("""SELECT sillas.id_silla
+    FROM sillas
+    WHERE sillas.id_silla NOT IN (
+    SELECT s.id_silla
+    FROM sillas s
+    INNER JOIN reservasillas rs ON rs.id_silla = s.id_silla
+    INNER JOIN reservas r ON r.id_reservas = rs.id_reservas
+    WHERE 
+    (
+        (
+        ((CONCAT(r.fecha, ' ', r.hora) <= %s) AND (r.fechahorasalida IS NULL OR r.fechahorasalida > %s))
+        OR
+        (CONCAT(r.fecha, ' ', r.hora) < %s AND r.fechahorasalida IS NULL)
+    )
+    AND (DATE(r.fecha) = DATE(%s))
+        )
+    )
+    """,(fechreser,fechreser,fechreser,fechreser))
+    sillasall = cursor.fetchall()
+    countsillasall = len(sillasall)
+    print(countsillasall)
 
-    return render_template('aceptar_solicitud.html',rmesas=rmesas ,user_row=user_row)
+    
+    return render_template('aceptar_solicitud.html',rmesas=rmesas ,user_row=user_row,countsillasall=countsillasall)
 
 #Solitudes aprobadas
 @app.route('/solicitudes_aprobadas', methods=['GET', 'POST'])
@@ -556,7 +575,7 @@ def solicitudes_aprobadas():
     # Obtener las solicitudes pendientes de la base de datos
     db = connectionBD()
     cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT u.user_id, u.nombres, u.apellidos, r.id_reservas, r.cantperson, TIME_FORMAT(r.hora, '%h:%i %p') AS hora, r.estancia, DATE_FORMAT(r.fecha, '%Y-%m-%d') AS fecha, r.estado, DATE_FORMAT(r.registroreserva, '%Y-%m-%d %h:%i %p') AS registroreserva FROM reservas r INNER JOIN usuarios u ON r.user_id = u.user_id WHERE r.estado = 1;")
+    cursor.execute("SELECT u.user_id, u.nombres, u.apellidos, r.id_reservas, r.cantperson, TIME_FORMAT(r.hora, '%h:%i %p') AS hora, r.estancia, DATE_FORMAT(r.fecha, '%Y-%m-%d') AS fecha, r.estado, DATE_FORMAT(r.registroreserva, '%Y-%m-%d %h:%i %p') AS registroreserva, DATE_FORMAT(r.fecharespuesta, '%Y-%m-%d %h:%i %p') AS fecharespuesta  FROM reservas r  INNER JOIN usuarios u ON r.user_id = u.user_id  WHERE r.estado = 1 ORDER BY r.registroreserva DESC;")
     solicitudes = cursor.fetchall()
     cursor.close()
 
@@ -568,7 +587,7 @@ def solicitudes_aprobadas():
 def solicitudes_rechazadas():
     db = connectionBD()
     cursor = db.cursor(dictionary=True)
-    cursor.execute("SELECT u.user_id, u.nombres, u.apellidos, r.id_reservas, r.cantperson, TIME_FORMAT(r.hora, '%h:%i %p') AS hora, r.estancia, DATE_FORMAT(r.fecha, '%Y-%m-%d') AS fecha, r.estado, DATE_FORMAT(r.registroreserva, '%Y-%m-%d %h:%i %p') AS registroreserva FROM reservas r INNER JOIN usuarios u ON r.user_id = u.user_id WHERE r.estado = 2;")
+    cursor.execute("SELECT u.user_id, u.nombres, u.apellidos, r.id_reservas, r.cantperson, TIME_FORMAT(r.hora, '%h:%i %p') AS hora, r.estancia, DATE_FORMAT(r.fecha, '%Y-%m-%d') AS fecha, r.estado, DATE_FORMAT(r.registroreserva, '%Y-%m-%d %h:%i %p') AS registroreserva, DATE_FORMAT(r.fecharespuesta, '%Y-%m-%d %h:%i %p') AS fecharespuesta FROM reservas r INNER JOIN usuarios u ON r.user_id = u.user_id WHERE r.estado = 2;")
     solicitudes = cursor.fetchall()
     cursor.close()
 
@@ -586,6 +605,39 @@ def ver_rechazo(id_reservas):
     user_row = cursor.fetchone()
 
     return render_template('ver_rechazo.html', user_row=user_row)
+
+@app.route('/ver_aprobada/<int:id_reservas>', methods=['GET', 'POST'])
+def ver_aprobada(id_reservas):
+
+
+    db = connectionBD()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SET lc_time_names = 'es_ES'")
+    cursor.execute("SELECT u.user_id, u.nombres, u.apellidos, u.cedula, u.correo, u.contraseña, u.telefono, r.id_reservas, r.cantperson, TIME_FORMAT(r.hora, '%h:%i %p') AS hora, r.estancia, DATE_FORMAT(r.fecha, '%W %d de %M de %Y') AS fecha, r.estado, DATE_FORMAT(r.registroreserva, '%Y-%m-%d %h:%i %p') AS registroreserva, DATE_FORMAT(r.fecharespuesta, '%Y-%m-%d %h:%i %p') AS fecharespuesta, r.descripcion FROM reservas r INNER JOIN usuarios u ON r.user_id = u.user_id WHERE r.id_reservas = %s", (id_reservas,))
+    #cursor.execute("SELECT id_mesa FROM reservamesa WHERE id_reservas = %s", (id_reservas,))
+    user_row = cursor.fetchone()
+
+    # Ahora obtener los ids de las mesas reservadas
+    id_reservas = user_row['id_reservas']
+    cursor.execute("SELECT id_mesa FROM reservamesa WHERE id_reservas = %s", (id_reservas,))
+    ids_mesas = cursor.fetchall()
+
+    return render_template('ver_aprobada.html', user_row=user_row, ids_mesas=ids_mesas)
+
+#Ruta para visualizar las reservas de la vista recepcionista
+@app.route('/recepcionista_reservas', methods=['GET', 'POST'])
+def recepcionista_reservas():
+    # Obtener las solicitudes pendientes de la base de datos
+    db = connectionBD()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT u.user_id, u.nombres, u.apellidos, r.id_reservas, r.cantperson, TIME_FORMAT(r.hora, '%h:%i %p') AS hora, r.estancia, DATE_FORMAT(r.fecha, '%Y-%m-%d') AS fecha, r.estado, DATE_FORMAT(r.registroreserva, '%Y-%m-%d %h:%i %p') AS registroreserva, DATE_FORMAT(r.fecharespuesta, '%Y-%m-%d %h:%i %p') AS fecharespuesta FROM reservas r INNER JOIN usuarios u ON r.user_id = u.user_id WHERE r.estado = 1 AND DATE(r.fecha) = CURDATE() ORDER BY r.registroreserva DESC;")
+    solicitudes = cursor.fetchall()
+    cursor.close()
+
+
+    return render_template('recepcionista_reservas.html', solicitudes=solicitudes)
+
+
 
 if __name__=='__main__':
     

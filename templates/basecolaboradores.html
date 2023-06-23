@@ -275,7 +275,7 @@
                             <!-- Validación si es recepcionista -->
                             {% if g.id_rol == 2 or g.id_rol == 3%}
                             <li class="nav-item">
-                                <a class="nav-link d-flex align-items-center gap-2" href="#">
+                                <a class="nav-link d-flex align-items-center gap-2" href="{{ url_for('recepcionista_reservas')}}">
                                     <svg class="bi">
                                         <use xlink:href="#people" />
                                     </svg>
@@ -301,7 +301,7 @@
                                         <svg class="bi">
                                             <use xlink:href="#door-closed" />
                                         </svg>
-                                        Sign out
+                                        Cerrar sesión
                                     </a>
                                 </li>
                             </ul>

@@ -90,6 +90,11 @@
 													solicitud</b></label>
 											<p>{{ user_row.registroreserva }}</p>
 										</div>
+										
+									</div>
+									<div>
+										<label class="confirm-label text-center"><b>Cantidad de sillas disponibles</b></label>
+										<p>{{ countsillasall }}</p>
 									</div>
 									<h2 class="fs-title text-center">Seleccion de mesas</h2>
 
@@ -119,7 +124,7 @@
 											<button class="btn btn-success" type="submit"
 												id="save-submit-btn">Aceptar</button>
 											<a href="/rechazo_solicitud/{{ user_row.id_reservas }}"
-												class="btn btn-danger">Rehazar</a>
+												class="btn btn-danger">Rechazar</a>
 										</div>
 									</div>
 

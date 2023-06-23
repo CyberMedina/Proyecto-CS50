@@ -19,8 +19,9 @@
                 <th scope="col">Cantidad de personas</th>
                 <th scope="col">Hora</th>
                 <th scope="col">Estancia</th>
-                <th scope="col">Fecha de reserva</th>
-                <th scope="col">Fecha de solicitud</th>
+                <th scope="col">Fecha reserva</th>
+                <th scope="col">Fecha solicitud</th>
+                <th scope="col">Fecha aprobación</th>
                 <th scope="col">Estado</th>
                 <th scope="col">Acciones</th>
             </tr>
@@ -34,6 +35,7 @@
                 <td>{{ solicitud.estancia }} hrs</td>
                 <td>{{ solicitud.fecha }}</td>
                 <td>{{ solicitud.registroreserva }}</td>
+                <td>{{ solicitud.fecharespuesta }}</td>
                 <td>
                     {% if solicitud.estado == 0 %}
                     Pendiente
@@ -43,7 +45,7 @@
                     Rechazado
                     {% endif %}
                 </td>
-                <td><a href="/aceptar_solicitud/{{ solicitud.id_reservas }}" class="btn btn-info">Ver más</a>
+                <td><a href="/ver_aprobada/{{ solicitud.id_reservas }}" class="btn btn-info">Ver más</a>
             </tr>
             {% endfor %}
         </tbody>

@@ -1,6 +1,6 @@
 {% extends './basecolaboradores.html'%}
 
-{% block title%}Solicitudes pendientes{% endblock %}
+{% block title%}Datos solicitud aprobada{% endblock %}
 
 {% block customCSS %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css')}}">
@@ -8,7 +8,7 @@
 {% endblock %}
 
 {% block body %}
-<h2>Datos solicitud rechazada</h2>
+<h2>Datos solicitud aprobada</h2>
 {% if error %}
 <div class="alert alert-danger mt-2" role="alert">
 	{{ error }}
@@ -67,12 +67,14 @@
 													solicitud</b></label>
 											<p>{{ user_row.registroreserva }}</p>
 										</div>
-									</div>
-									<h2 class="fs-title text-center">Motivo del rechazo</h2>
-									<p>{{ user_row.descripcion }}</p>
-									<div class="col-md-6">
-										<label class="confirm-label"><b>Fecha y hora del rechazo</b></label>
+										<label class="confirm-label"><b>Fecha y hora de la aprobación</b></label>
 										<p>{{ user_row.fecharespuesta }}</p>
+										<label class="confirm-label"><b>Mesas ocupadas</b></label>
+										{% for ids_mesa in ids_mesas %}
+
+										<p>Mesa No. {{ ids_mesa.id_mesa }}</p>
+
+										{% endfor %}
 									</div>
 								</div>
 							</fieldset>
