@@ -1,0 +1,543 @@
+{% extends './base.html'%}
+
+{% block title%}Inicio{% endblock %}
+
+{% block customCSS %}
+<link rel="stylesheet" href="{{ url_for('static', filename = 'css/home.css')}}">
+{% endblock %}
+
+
+
+
+{% block body %}
+<!-- Modal para inicio de usuario redirigdo a home_user -->
+<div class="modal fade" id="iniciosesion" tabindex="-1" role="dialog" aria-labelledby="iniciosesionTitle"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="iniciosesionTitle">Inicio de sesión</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="form-signin text-center" action="/login_usuario" method="POST">
+                    <div class="form-group">
+                        <label for="correo">Correo electrónico</label>
+                        <input type="text" class="form-control" id="correo" name="correo"
+                            placeholder="Correo electrónico" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="contraseña">Contraseña</label>
+                        <input type="password" class="form-control" id="contraseña" name="contraseña"
+                            placeholder="Contraseña" required>
+                    </div>
+                    <button class="btn btn-primary btn-sm btn-block" type="submit">Iniciar sesión</button>
+                    {% if error %}
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                    
+                            const myModal = new bootstrap.Modal(document.getElementById('iniciosesion'));
+                            myModal.show();
+                        })
+                    </script>
+                    <div class="alert alert-danger mt-2" role="alert">
+                        {{ error }}
+                    </div>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<!-- Modal para inicio de usuario redirigdo a reservas -->
+<div class="modal fade" id="iniciosesion2" tabindex="-1" role="dialog" aria-labelledby="iniciosesion2Title"
+    aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="iniciosesion2Title">Inicio de sesión</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form class="form-signin text-center" action="/login_usuario2" method="POST">
+                    <div class="form-group">
+                        <label for="correo">Correo electrónico</label>
+                        <input type="text" class="form-control" id="correo" name="correo"
+                            placeholder="Correo electrónico" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="contraseña">Contraseña</label>
+                        <input type="password" class="form-control" id="contraseña" name="contraseña"
+                            placeholder="Contraseña" required>
+                    </div>
+                    <button class="btn btn-primary btn-block" type="submit">Iniciar sesión</button>
+                    {% if error %}
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                    
+                            const myModal = new bootstrap.Modal(document.getElementById('iniciosesion2'));
+                            myModal.show();
+                        })
+                    </script>
+                    <div class="alert alert-danger mt-2" role="alert">
+                        {{ error }}
+                    </div>
+                    {% endif %}
+
+                    {% if error2 %}
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function () {
+                    
+                            const myModal = new bootstrap.Modal(document.getElementById('iniciosesion2'));
+                            myModal.show();
+                        })
+                    </script>
+                    <div class="alert alert-danger mt-2" role="alert">
+                        {{ error2 }}
+                    </div>
+                    {% endif %}
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Carousel Start -->
+<div class="container-fluid p-0 pt-5">
+    <div id="header-carousel" class="carousel slide" data-ride="carousel">
+        <ol class="carousel-indicators">
+            <li data-target="#header-carousel" data-slide-to="0" class="active"></li>
+            <li data-target="#header-carousel" data-slide-to="1"></li>
+        </ol>
+        <div class="carousel-inner carousel-fade">
+            <div class="carousel-item active">
+                <img class="w-100" src="{{ url_for('static', filename='img/fondo.webp') }}" alt="Image">
+                <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
+                    <div class="p-3" style="max-width: 900px;">
+                        <h1 class="display-3 text-white mb-md-4">Comer con tus amigos sabe mejor</h1>
+                    </div>
+                </div>
+            </div>
+            <div class="carousel-item">
+                <img class="w-100" src="{{ url_for('static', filename='img/fondo2.jpg') }}" alt="Image">
+                <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
+                    <div class="p-3" style="max-width: 900px;">
+                        <h1 class="display-3 text-white mb-md-4">Comer con la familia siempre es mejor</h1>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <a class="carousel-control-prev" href="#header-carousel" role="button" data-slide="prev">
+            <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+            <span class="sr-only">Previous</span>
+        </a>
+        <a class="carousel-control-next" href="#header-carousel" role="button" data-slide="next">
+            <span class="carousel-control-next-icon" aria-hidden="true"></span>
+            <span class="sr-only">Next</span>
+        </a>
+    </div>
+</div>
+
+
+<!-- Carousel End -->
+
+<!-- About Start -->
+<div class="container-fluid py-5">
+    <div class="container pt-5">
+        <div class="row">
+            <div class="col-lg-6" style="min-height: 500px;">
+                <div class="position-relative h-100">
+                    <img class="position-absolute w-100 h-100"
+                        src="{{url_for('static', filename='img/verticalres.png')}}" style="object-fit: cover;">
+                </div>
+            </div>
+
+            <div class="col-lg-6 pt-5 pb-lg-5">
+                <div class="about-text bg-white p-4 p-lg-5 my-lg-5" id="sobre">
+                    <h6 class="text-primary text-uppercase" style="letter-spacing: 10px;">El GUSTO CJ</h6>
+                    <h1 class="mb-3">¡Ofrecemos los mejores platillos de todo el mundo!</h1>
+                    <p class="text-justify">Nuestro restaurante es un lugar acogedor y auténtico, donde podrás disfrutar
+                        de una amplia
+                        variedad de platos tradicionales y fusiones creativas.
+
+                        Si prefieres explorar diferentes sabores y texturas, nuestro menú también ofrece una amplia
+                        gama de opciones que incluyen mariscos frescos del Caribe y el Pacífico, cortes de carne
+                        jugosos, deliciosos platos vegetarianos y opciones veganas. Nuestros chefs expertos se
+                        aseguran de utilizar ingredientes de alta calidad y combinaciones de especias que realzan
+                        los sabores característicos de cada plato.
+
+                    </p>
+                    <div class="row mb-4">
+                        <div class="col-6">
+                            <img class="img-fluid" src="{{url_for('static', filename='img/mesas.webp')}}" alt="">
+                        </div>
+                        <div class="col-6">
+                            <img class="img-fluid" src="{{url_for('static', filename='img/mesas2.jpg')}}" alt="">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+<!-- About End -->
+
+
+<!-- Feature Start -->
+
+<!-- Feature End -->
+
+
+<!-- Destination Start -->
+
+<!-- Destination Start -->
+
+
+<!-- Service Start -->
+<div class="container-fluid py-5 " id="servicios">
+    <div class="container pt-5 pb-3">
+        <div class="text-center mb-3 pb-3">
+            <h6 class="text-primary text-uppercase" style="letter-spacing: 5px;">Servicios</h6>
+            <h1>Fiestas y acompañantes</h1>
+        </div>
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="service-item bg-white text-center mb-2 py-5 px-4">
+                    <i class="fa fa-2x fa-route mx-auto mb-4"></i>
+                    <h5 class="mb-2">Fiesta - luna de miel</h5>
+                    <p class="m-0">Si estas en tu luna de miel te ofrecemos musica personalizada y actuaciones</p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="service-item bg-white text-center mb-2 py-5 px-4">
+                    <i class="fa fa-2x fa-ticket-alt mx-auto mb-4"></i>
+                    <h5 class="mb-2">Fiesta - Cumpleaños</h5>
+                    <p class="m-0">Te damos un pastel y cantamos feliz cumpleaños </p>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="service-item bg-white text-center mb-2 py-5 px-4">
+                    <i class="fa fa-2x fa-hotel mx-auto mb-4"></i>
+                    <h5 class="mb-2">Amigos</h5>
+                    <p class="m-0">Sino tienes amigos puedes comer con empleados disfrazados de tus amigos pero
+                        pagaras todas sus cuentas</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="container-fluid py-5" id="menu">
+    <div class="container pt-5 pb-3">
+        <div class="text-center mb-3 pb-3">
+            <h6 class="text-primary text-uppercase" style="letter-spacing: 5px;">Menú</h6>
+            <h1>Los mejores menús</h1>
+        </div>
+        <div class="row">
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="package-item bg-white mb-2">
+                    <img class="img-fluid" src="{{url_for('static', filename='img/hamburguesaspollo.jpg')}}" alt="">
+                    <div class="p-4">
+                        <div class="d-flex justify-content-between mb-3">
+                            <small class="m-0"><i class=""></i>Grande</small>
+                            <small class="m-0"><i class=""></i>Mediana</small>
+                            <small class="m-0"><i class=""></i>Pequeña</small>
+                        </div>
+                        <a class="h5 text-decoration-none" href="">hamburguesas de pollo con papas</a>
+                        <div class="border-top mt-4 pt-4">
+                            <div class="d-flex justify-content-between">
+                                <h6 class="m-0"><i class="fa fa-star text-primary mr-2"></i>4.5 <small>(250)</small>
+                                </h6>
+                                <h5 class="m-0">NIO 350</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="package-item bg-white mb-2">
+                    <img class="img-fluid" src="{{url_for('static', filename='img/camarones.jpg')}}" alt="">
+                    <div class="p-4">
+                        <div class="d-flex justify-content-between mb-3">
+                            <small class="m-0"><i class=""></i>Chile</small>
+                        </div>
+                        <a class="h5 text-decoration-none" href="">camarones fritos con mantequilla</a>
+                        <div class="border-top mt-4 pt-4">
+                            <div class="d-flex justify-content-between">
+                                <h6 class="m-0"><i class="fa fa-star text-primary mr-2"></i>4.5 <small>(250)</small>
+                                </h6>
+                                <h5 class="m-0">NIO 450</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="package-item bg-white mb-2">
+                    <img class="img-fluid" src="{{url_for('static', filename='img/Arroz.jpg')}}" alt="">
+                    <div class="p-4">
+                        <div class="d-flex justify-content-between mb-3">
+                            <small class="m-0"><i class=""></i>Bebida gratis</small>
+                        </div>
+                        <a class="h5 text-decoration-none" href="">Arroz con huevo y platano</a>
+                        <div class="border-top mt-4 pt-4">
+                            <div class="d-flex justify-content-between">
+                                <h6 class="m-0"><i class="fa fa-star text-primary mr-2"></i>4.5 <small>(250)</small>
+                                </h6>
+                                <h5 class="m-0">NIO 250</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="package-item bg-white mb-2">
+                    <img class="img-fluid" src="{{url_for('static', filename='img/sopa.webp')}}" alt="">
+                    <div class="p-4">
+                        <div class="d-flex justify-content-between mb-3">
+                        </div>
+                        <a class="h5 text-decoration-none" href="">Sopa vegetariana de zanahoria</a>
+                        <div class="border-top mt-4 pt-4">
+                            <div class="d-flex justify-content-between">
+                                <h6 class="m-0"><i class="fa fa-star text-primary mr-2"></i>4.5 <small>(250)</small>
+                                </h6>
+                                <h5 class="m-0">NIO 315</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="package-item bg-white mb-2">
+                    <img class="uno img-fluid" src="{{url_for('static', filename='img/albondigas.jpg')}}" alt="">
+                    <div class="p-4">
+                        <div class="d-flex justify-content-between mb-3">
+                        </div>
+                        <a class="h5 text-decoration-none" href="">Albodigas vegetarianas</a>
+                        <div class="border-top mt-4 pt-4">
+                            <div class="d-flex justify-content-between">
+                                <h6 class="m-0"><i class="fa fa-star text-primary mr-2"></i>4.5 <small>(250)</small>
+                                </h6>
+                                <h5 class="m-0">NIO 400</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-4 col-md-6 mb-4">
+                <div class="package-item bg-white mb-2">
+                    <img class="img-fluid" src="{{url_for('static', filename='img/Majado Gourmet.jpg')}}" alt="">
+                    <div class="p-4">
+                        <div class="d-flex justify-content-between mb-3">
+                            <small class="m-0"><i class="fa fa-map-marker-alt text-primary mr-2"></i>Thailand</small>
+                            <small class="m-0"><i class="fa fa-calendar-alt text-primary mr-2"></i>3 days</small>
+                            <small class="m-0"><i class="fa fa-user text-primary mr-2"></i>2 Person</small>
+                        </div>
+                        <a class="h5 text-decoration-none" href="">Majado Gourmet</a>
+                        <div class="border-top mt-4 pt-4">
+                            <div class="d-flex justify-content-between">
+                                <h6 class="m-0"><i class="fa fa-star text-primary mr-2"></i>4.5 <small>(250)</small>
+                                </h6>
+                                <h5 class="m-0">NIO 2300</h5>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Packages End -->
+
+
+<!-- Registration Start -->
+<div class="container-fluid bg-registration py-5" style="margin: 90px 0;">
+    <div class="container py-5">
+        <div class="row align-items-center">
+            <div class="col-lg-7 mb-5 mb-lg-0">
+                <div class="mb-4">
+                    <h6 class="text-primary text-uppercase" style="letter-spacing: 5px;">Mega Oferta</h6>
+                    <h1 class="text-white"><span class="text-primary">30% Descuento</span> Si eres un chino</h1>
+                    <h1 class="text-white"><span class="text-primary">¡Reserva</span> Ahora mismo!</h1>
+                </div>
+                <p class="text-white">Hacer tu reserva nunca habia sido tan facil y rapido, solo sigue los pasos y
+                    pronto estaras comiendo en <span class="text-primary">EL GUSTO CJ</span> </p>
+                <ul class="list-inline text-white m-0">
+                    <li class="py-2"><i class="fa fa-check text-primary mr-3"></i>Registrate</li>
+                    <li class="py-2"><i class="fa fa-check text-primary mr-3"></i>Reserva tu dia</li>
+                    <li class="py-2"><i class="fa fa-check text-primary mr-3"></i>A comer</li>
+                </ul>
+            </div>
+            <div class="col-lg-5">
+                <div class="card border-0">
+                    <div class="card-header bg-primary text-center p-4">
+                        <h1 class="text-white m-0">Reserva Ahora</h1>
+                    </div>
+                    <div class="card-body rounded-bottom bg-white p-5">
+                        <a href="{{ url_for('reserva') }}" class="btn btn-block py-3 border-10 "
+                            type="submit">Reservar</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Registration End -->
+
+
+<!-- Team Start -->
+<div class="container-fluid py-5">
+    <div class="container pt-5 pb-3">
+        <div class="text-center mb-3 pb-3">
+            <h6 class="text-primary text-uppercase" style="letter-spacing: 5px;">Nuestros Chefs</h6>
+            <h1>Chefs totalmente especializados</h1>
+        </div>
+        <div class="row">
+            <div class="col-lg-3 col-md-4 col-sm-6 pb-2">
+                <div class="team-item bg-white mb-4">
+                    <div class="team-img position-relative overflow-hidden">
+                        <img class="img-fluid w-100" src="{{url_for('static', filename='img/team-1.jpg')}}" alt="">
+                        <div class="team-social">
+                            <a class="btn btn-outline-primary btn-square" href=""><i class="fab fa-twitter"></i></a>
+                            <a class="btn btn-outline-primary btn-square" href=""><i class="fab fa-facebook-f"></i></a>
+                            <a class="btn btn-outline-primary btn-square" href=""><i class="fab fa-instagram"></i></a>
+                            <a class="btn btn-outline-primary btn-square" href=""><i class="fab fa-linkedin-in"></i></a>
+                        </div>
+                    </div>
+                    <div class="text-center py-4">
+                        <h5 class="text-truncate">Maria Carrasco</h5>
+                        <p class="m-0">Mariscos</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-4 col-sm-6 pb-2">
+                <div class="team-item bg-white mb-4">
+                    <div class="team-img position-relative overflow-hidden">
+                        <img class="img-fluid w-100" src="{{url_for('static', filename='img/team-2.jpg')}}" alt="">
+                        <div class="team-social">
+                            <a class="btn btn-outline-primary btn-square" href=""><i class="fab fa-twitter"></i></a>
+                            <a class="btn btn-outline-primary btn-square" href=""><i class="fab fa-facebook-f"></i></a>
+                            <a class="btn btn-outline-primary btn-square" href=""><i class="fab fa-instagram"></i></a>
+                            <a class="btn btn-outline-primary btn-square" href=""><i class="fab fa-linkedin-in"></i></a>
+                        </div>
+                    </div>
+                    <div class="text-center py-4">
+                        <h5 class="text-truncate">Ricardo Lopéz</h5>
+                        <p class="m-0">Pollo</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-4 col-sm-6 pb-2">
+                <div class="team-item bg-white mb-4">
+                    <div class="team-img position-relative overflow-hidden">
+                        <img class="img-fluid w-100" src="{{url_for('static', filename='img/team-3.jpg')}}" alt="">
+                        <div class="team-social">
+                            <a class="btn btn-outline-primary btn-square" href=""><i class="fab fa-twitter"></i></a>
+                            <a class="btn btn-outline-primary btn-square" href=""><i class="fab fa-facebook-f"></i></a>
+                            <a class="btn btn-outline-primary btn-square" href=""><i class="fab fa-instagram"></i></a>
+                            <a class="btn btn-outline-primary btn-square" href=""><i class="fab fa-linkedin-in"></i></a>
+                        </div>
+                    </div>
+                    <div class="text-center py-4">
+                        <h5 class="text-truncate">Celeste Ramírez</h5>
+                        <p class="m-0">Carne</p>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-3 col-md-4 col-sm-6 pb-2">
+                <div class="team-item bg-white mb-4">
+                    <div class="team-img position-relative overflow-hidden">
+                        <img class="img-fluid w-100" src="{{url_for('static', filename='img/team-4.jpg')}}" alt="">
+                        <div class="team-social">
+                            <a class="btn btn-outline-primary btn-square" href=""><i class="fab fa-twitter"></i></a>
+                            <a class="btn btn-outline-primary btn-square" href=""><i class="fab fa-facebook-f"></i></a>
+                            <a class="btn btn-outline-primary btn-square" href=""><i class="fab fa-instagram"></i></a>
+                            <a class="btn btn-outline-primary btn-square" href=""><i class="fab fa-linkedin-in"></i></a>
+                        </div>
+                    </div>
+                    <div class="text-center py-4">
+                        <h5 class="text-truncate">Miguel Aguilar</h5>
+                        <p class="m-0">Vegetariano</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Team End -->
+
+
+<!-- Testimonial Start -->
+<div class="container-fluid py-5">
+    <div class="container py-5">
+        <div class="text-center mb-3 pb-3">
+            <h6 class="text-primary text-uppercase" style="letter-spacing: 5px;">Opiniones</h6>
+            <h1>Que dicen nuestros clientes</h1>
+        </div>
+        <div class="owl-carousel testimonial-carousel">
+            <div class="text-center pb-4">
+                <img class="img-fluid mx-auto" src="{{url_for('static', filename='img/carloslol.jpg')}}"
+                    style="width: 100px; height: 100px;">
+                <div class="testimonial-text bg-white p-4 mt-n5">
+                    <p class="mt-5">La comida vegetariana es lo mejor que he probado en toda nicaragua!
+                    </p>
+                    <h5 class="text-truncate">Carlos Vasquez</h5>
+                    <span>Ingeniero y master LOL</span>
+                </div>
+            </div>
+            <div class="text-center">
+                <img class="img-fluid mx-auto" src="{{url_for('static', filename='img/jho9natan.jpg')}}"
+                    style="width: 100px; height: 100px;">
+                <div class="testimonial-text bg-white p-4 mt-n5">
+                    <p class="mt-5">Sin dudas comere todas las noches en este restaurante, me encantan las
+                        albondigas, sin embargo, le faltaba un poco de sal.
+                    </p>
+                    <h5 class="text-truncate">Jhonatan Medina</h5>
+                    <span>Critico profesional</span>
+                </div>
+            </div>
+            <div class="text-center">
+                <img class="img-fluid mx-auto" src="{{url_for('static', filename='img/testimonial-4.jpg')}}"
+                    style="width: 100px; height: 100px;">
+                <div class="testimonial-text bg-white p-4 mt-n5">
+                    <p class="mt-5">Faltan aspectos que mejorar en el local pero puedo decir que la comida lo
+                        compensa, muy buena.
+                    </p>
+                    <h5 class="text-truncate">Matías Guadamuz</h5>
+                    <span>Diseñador web</span>
+                </div>
+            </div>
+            <div class="text-center">
+                <img class="img-fluid mx-auto" src="{{url_for('static', filename='img/testimonial-4.jpg')}}"
+                    style="width: 100px; height: 100px;">
+                <div class="testimonial-text bg-white p-4 mt-n5">
+                    <p class="mt-5">Dolor et eos labore, stet justo sed est sed. Diam sed sed dolor stet amet eirmod
+                        eos labore diam
+                    </p>
+                    <h5 class="text-truncate">Client Name</h5>
+                    <span>Profession</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Testimonial End -->
+
+
+<!-- Blog Start -->
+
+<!-- Blog End -->
+
+
+
+{% endblock %}
+
+{% block customJS %}
+{% endblock %}
