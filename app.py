@@ -11,7 +11,8 @@ from config import connectionBD
 from flask import Flask
 from flask_mail import Mail, Message
 from flask import Flask, g #Con esto podemos tener una variable global para poder ser usadas nuestros HTML con jinja
-import os 
+import os
+from datetime import datetime
 
 
 
@@ -406,27 +407,148 @@ def enviar_correo(destinatario, asunto, cuerpo):
     mensaje.body = cuerpo
     mail.send(mensaje)
 
+
+
 # Ruta parar el formulario de aceptación de la solicitud
 @app.route('/aceptar_solicitud/<int:id_reservas>', methods=['GET', 'POST'])
 def aceptar_solicitud(id_reservas):
      
     if request.method == "POST":
+        db = connectionBD()
+        cursor = db.cursor(dictionary=True)
+        cursor.execute("SET lc_time_names = 'es_ES'")
+        cursor.execute("SELECT CONCAT(r.fecha,' ',r.hora) as fechreser, u.user_id, u.nombres, u.apellidos, u.cedula, u.correo, u.contraseña, u.telefono, r.id_reservas, r.cantperson, TIME_FORMAT(r.hora, '%h:%i %p') AS hora, r.estancia, DATE_FORMAT(r.fecha, '%W %d de %M de %Y') AS fecha, r.estado, DATE_FORMAT(r.registroreserva, '%Y-%m-%d %h:%i %p') AS registroreserva FROM reservas r INNER JOIN usuarios u ON r.user_id = u.user_id WHERE r.id_reservas = %s", (id_reservas,))
+        user_row = cursor.fetchone()
+
+        fechreser = datetime.strptime(user_row['fechreser'], '%Y-%m-%d %H:%M:%S')
+    
+  
+        cursor.execute("""SELECT mesas.id_mesa, mesas.id_tipmesa,tipomesa.max_sillas
+        FROM mesas
+        INNER JOIN tipomesa on mesas.id_mesa = tipomesa.id_tipmesa
+        WHERE mesas.id_mesa NOT IN (
+        SELECT m.id_mesa
+        FROM mesas m
+        INNER JOIN reservamesa rm ON rm.id_mesa = m.id_mesa
+        INNER JOIN reservas r ON r.id_reservas = rm.id_reservas
+        WHERE 
+        (
+            (
+            ((CONCAT(r.fecha, ' ', r.hora) <= %s) AND (r.fechahorasalida IS NULL OR r.fechahorasalida > %s))
+            OR
+            (CONCAT(r.fecha, ' ', r.hora) < %s AND r.fechahorasalida IS NULL)
+        )
+        AND (DATE(r.fecha) = DATE(%s))
+            )
+        )
+        """, (fechreser,fechreser,fechreser,fechreser))
+
+        # cursor.execute("SELECT m.id_mesa, t.max_sillas FROM mesas m INNER JOIN tipomesa t ON m.id_tipmesa = t.id_tipmesa")
+        rmesas = cursor.fetchall()
+
+        cantperson = user_row['cantperson']
+        
+        # Validacion de la cantidad de sillas disponibles en las mesas
+        summxsilla = 0
+        for getid in request.form.getlist('cbmesas'):
+            cursor.execute("""SELECT t.max_sillas
+            FROM mesas m
+            INNER JOIN tipomesa t ON m.id_tipmesa = t.id_tipmesa
+            where 
+            m.id_mesa = %s""",(getid,))
+            
+            summxsilla = summxsilla + int(cursor.fetchone()['max_sillas'])
+        print(summxsilla)
+
+        if cantperson > summxsilla:
+            error = "La cantidad de sillas maximas del total de las mesas seleccionadas no es suficiente para satisfacer la cantidad de personas de la reserva."
+            return render_template('aceptar_solicitud.html', error=error, rmesas=rmesas ,user_row=user_row)
+            
+        #validacion de sillas disponibles
+        #aqui son las locuras de las sillas
+        cantperson = user_row['cantperson']
+
+        # obtenemos cantidad de sillas disponibles (maximo la cantidad de personas de la reserva)
+        cursor.execute("""SELECT sillas.id_silla
+        FROM sillas
+        WHERE sillas.id_silla NOT IN (
+        SELECT s.id_silla
+        FROM sillas s
+        INNER JOIN reservasillas rs ON rs.id_silla = s.id_silla
+        INNER JOIN reservas r ON r.id_reservas = rs.id_reservas
+        WHERE 
+        (
+            (
+            ((CONCAT(r.fecha, ' ', r.hora) <= %s) AND (r.fechahorasalida IS NULL OR r.fechahorasalida > %s))
+            OR
+            (CONCAT(r.fecha, ' ', r.hora) < %s AND r.fechahorasalida IS NULL)
+        )
+        AND (DATE(r.fecha) = DATE(%s))
+            )
+        )
+        LIMIT %s
+        """,(fechreser,fechreser,fechreser,fechreser,cantperson))
+
+        # Entonces si la cantidad de filas que retorne la consulta es menor a la cantidad de personas de la reserva, le decimos que no puede reservar
+        # Porque eso significaria que no hay sillas disponibles para satisfacer la reserva a esa hora
+        sillas = cursor.fetchall()
+        countsillas = len(sillas)
+        if countsillas < cantperson:
+            error = "No se puede reservar debido a que la cantidad de personas es mayor a la cantidad de sillas disponible"
+            return render_template('aceptar_solicitud.html', error=error, rmesas=rmesas ,user_row=user_row)
+
+        for getid in request.form.getlist('cbmesas'):
+            cursor.execute("insert into reservamesa(id_reservas,id_mesa) VALUES (%s,%s)",(id_reservas,getid))
+
+        for idsil in sillas:
+            cursor.execute("insert into reservasillas(id_reservas,id_silla) VALUES (%s,%s)",(id_reservas,idsil['id_silla']))
+            
+        
+        usersis_id = session['usersis_id']
+        fecharespuesta = datetime.now().strftime('%Y-%m-%d %H:%M:%S') 
+        estado = 1
+        cursor.execute("update reservas set usersis_id = %s, estado = %s, fecharespuesta = %s WHERE id_reservas = %s", (usersis_id,estado,fecharespuesta,id_reservas))
+        db.commit()
         return redirect(url_for('solicitudes_pendientes'))
     
 
-        
 
     db = connectionBD()
     cursor = db.cursor(dictionary=True)
     cursor.execute("SET lc_time_names = 'es_ES'")
-    cursor.execute("SELECT u.user_id, u.nombres, u.apellidos, u.cedula, u.correo, u.contraseña, u.telefono, r.id_reservas, r.cantperson, TIME_FORMAT(r.hora, '%h:%i %p') AS hora, r.estancia, DATE_FORMAT(r.fecha, '%W %d de %M de %Y') AS fecha, r.estado, DATE_FORMAT(r.registroreserva, '%Y-%m-%d %h:%i %p') AS registroreserva FROM reservas r INNER JOIN usuarios u ON r.user_id = u.user_id WHERE r.id_reservas = %s", (id_reservas,))
+    cursor.execute("SELECT CONCAT(r.fecha,' ',r.hora) as fechreser, u.user_id, u.nombres, u.apellidos, u.cedula, u.correo, u.contraseña, u.telefono, r.id_reservas, r.cantperson, TIME_FORMAT(r.hora, '%h:%i %p') AS hora, r.estancia, DATE_FORMAT(r.fecha, '%W %d de %M de %Y') AS fecha, r.estado, DATE_FORMAT(r.registroreserva, '%Y-%m-%d %h:%i %p') AS registroreserva FROM reservas r INNER JOIN usuarios u ON r.user_id = u.user_id WHERE r.id_reservas = %s", (id_reservas,))
     user_row = cursor.fetchone()
-        
+
+    fechreser = datetime.strptime(user_row['fechreser'], '%Y-%m-%d %H:%M:%S')
+    
+  
+    cursor.execute("""SELECT mesas.id_mesa, mesas.id_tipmesa,tipomesa.max_sillas
+FROM mesas
+INNER JOIN tipomesa on mesas.id_mesa = tipomesa.id_tipmesa
+WHERE mesas.id_mesa NOT IN (
+SELECT m.id_mesa
+FROM mesas m
+INNER JOIN reservamesa rm ON rm.id_mesa = m.id_mesa
+INNER JOIN reservas r ON r.id_reservas = rm.id_reservas
+WHERE 
+(
+    (
+    ((CONCAT(r.fecha, ' ', r.hora) <= %s) AND (r.fechahorasalida IS NULL OR r.fechahorasalida > %s))
+    OR
+    (CONCAT(r.fecha, ' ', r.hora) < %s AND r.fechahorasalida IS NULL)
+)
+AND (DATE(r.fecha) = DATE(%s))
+    )
+)
+""", (fechreser,fechreser,fechreser,fechreser))
+
+    # cursor.execute("SELECT m.id_mesa, t.max_sillas FROM mesas m INNER JOIN tipomesa t ON m.id_tipmesa = t.id_tipmesa")
+    rmesas = cursor.fetchall()
+    
+    
 
 
-
-
-    return render_template('aceptar_solicitud.html', user_row=user_row)
+    return render_template('aceptar_solicitud.html',rmesas=rmesas ,user_row=user_row)
 
 #Solitudes aprobadas
 @app.route('/solicitudes_aprobadas', methods=['GET', 'POST'])
