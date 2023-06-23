@@ -41,6 +41,7 @@ def before_request():
     
     if 'user_id' in session:
         g.user_id = session['user_id']
+        print(g.user_id)
 
 
 

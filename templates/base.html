@@ -79,16 +79,15 @@
                                 Sesión
                             </a>
                             <div class="dropdown-menu" aria-labelledby="btn-dropdown-catalogo">
+                                {% if g.user_id %}
+                                <a class="dropdown-item" href="{{ url_for('editar_usuario') }}">Mi perfil</a>
+                                <a class="dropdown-item" href="{{ url_for('CerrarSesion') }}">Cerrar Sesión</a>
 
-                                {% if g.user_id == null %}
+                                {% else %}
                                 <a class="dropdown-item" href="{{ url_for('login_usuario') }}">Iniciar
                                     sesión</a>
                                 <a class="dropdown-item" href="{{ url_for('registro_usuario') }}">Registrarse</a>
-                                {% endif %}
-                                
-                                {% if g.user_id == true %}
-                                <a class="dropdown-item" href="{{ url_for('editar_usuario') }}">Mi perfil</a>
-                                <a class="dropdown-item" href="{{ url_for('CerrarSesion') }}">Cerrar Sesión</a>
+
                                 {% endif %}
                             </div>
                         </div>
