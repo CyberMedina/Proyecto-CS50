@@ -446,27 +446,6 @@ def aceptar_solicitud(id_reservas):
         rmesas = cursor.fetchall()
 
         cantperson = user_row['cantperson']
-        
-        # Validacion de la cantidad de sillas disponibles en las mesas
-        summxsilla = 0
-        for getid in request.form.getlist('cbmesas'):
-            cursor.execute("""SELECT t.max_sillas
-            FROM mesas m
-            INNER JOIN tipomesa t ON m.id_tipmesa = t.id_tipmesa
-            where 
-            m.id_mesa = %s""",(getid,))
-            
-            summxsilla = summxsilla + int(cursor.fetchone()['max_sillas'])
-        print(summxsilla)
-
-        if cantperson > summxsilla:
-            error = "La cantidad de sillas maximas del total de las mesas seleccionadas no es suficiente para satisfacer la cantidad de personas de la reserva."
-            return redirect(url_for('aceptar_solicitud.html', rmesas=rmesas ,user_row=user_row))
-            
-        #validacion de sillas disponibles
-        #aqui son las locuras de las sillas
-        cantperson = user_row['cantperson']
-
         # obtenemos cantidad de sillas disponibles (maximo la cantidad de personas de la reserva)
         cursor.execute("""SELECT sillas.id_silla
         FROM sillas
@@ -492,9 +471,31 @@ def aceptar_solicitud(id_reservas):
         # Porque eso significaria que no hay sillas disponibles para satisfacer la reserva a esa hora
         sillas = cursor.fetchall()
         countsillas = len(sillas)
+        
+        # Validacion de la cantidad de sillas disponibles en las mesas
+        summxsilla = 0
+        for getid in request.form.getlist('cbmesas'):
+            cursor.execute("""SELECT t.max_sillas
+            FROM mesas m
+            INNER JOIN tipomesa t ON m.id_tipmesa = t.id_tipmesa
+            where 
+            m.id_mesa = %s""",(getid,))
+            
+            summxsilla = summxsilla + int(cursor.fetchone()['max_sillas'])
+        print(summxsilla)
+
+        if cantperson > summxsilla:
+            error = "La cantidad de sillas maximas del total de las mesas seleccionadas no es suficiente para satisfacer la cantidad de personas de la reserva."
+            return render_template('aceptar_solicitud.html', error=error, rmesas=rmesas ,user_row=user_row,countsillas=countsillas)
+            
+        #validacion de sillas disponibles
+        #aqui son las locuras de las sillas
+        cantperson = user_row['cantperson']
+
+        
         if countsillas < cantperson:
             error = "No se puede reservar debido a que la cantidad de personas es mayor a la cantidad de sillas disponible"
-            return render_template('aceptar_solicitud.html', error=error, rmesas=rmesas ,user_row=user_row)
+            return render_template('aceptar_solicitud.html', error=error, rmesas=rmesas ,user_row=user_row,countsillas=countsillas)
 
         for getid in request.form.getlist('cbmesas'):
             cursor.execute("insert into reservamesa(id_reservas,id_mesa) VALUES (%s,%s)",(id_reservas,getid))
@@ -709,11 +710,13 @@ def recepcionista_reserva_activa():
 
 @app.route('/cancela_reserva_activa/<int:id_reservas>', methods=['GET', 'POST'])
 def cancela_reserva_activa(id_reservas):
+    fechasalida = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     db = connectionBD()
     cursor = db.cursor(dictionary=True)
     cursor.execute("delete from reservamesa where id_reservas = %s",(id_reservas,))
     cursor.execute("delete from reservasillas where id_reservas = %s",(id_reservas,))
-    cursor.execute("update reservas set estado = 5 where id_reservas = %s",(id_reservas,))
+    cursor.execute("update reservas set estado = 5,fechahorasalida = %s  where id_reservas = %s",(fechasalida,id_reservas))
+    # cursor.execute("update reservas set fechahorasalida = %s where id_reservas = %s",fecharespuesta,id_reservas,)
 
     db.commit()
 
