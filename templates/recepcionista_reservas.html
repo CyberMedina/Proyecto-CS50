@@ -41,7 +41,8 @@
                     Cliente en mesa
                     {% endif %}
                 </td>
-                <td><a href="/ver_aprobada/{{ solicitud.id_reservas }}" class="btn btn-info">Ver más</a>
+                <td><a href="/ver_aprobada/{{ solicitud.id_reservas }}" class="btn btn-success">Aceptar</a>
+                    <a href="/ver_aprobada/{{ solicitud.id_reservas }}" class="btn btn-danger">Cancelar</a>
             </tr>
             {% endfor %}
         </tbody>

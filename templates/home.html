@@ -8,7 +8,8 @@
 
 {% block body %}
 <!-- Modal para inicio de usuario redirigdo a home_user -->
-<div class="modal fade" id="iniciosesion" tabindex="-1" role="dialog" aria-labelledby="iniciosesionTitle" aria-hidden="true">
+<div class="modal fade" id="iniciosesion" tabindex="-1" role="dialog" aria-labelledby="iniciosesionTitle"
+    aria-hidden="true">
     <div class="modal-dialog modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-header">
@@ -20,7 +21,8 @@
             <div class="modal-body">
                 <form class="form-signin text-center" action="/login_usuario" method="POST">
                     <div class="form-group">
-                        <label class="" for="correo" style="display: block; text-align: left;">Correo electrónico</label>
+                        <label class="" for="correo" style="display: block; text-align: left;">Correo
+                            electrónico</label>
                         <input type="text" class="form-control" id="correo" name="correo" required>
                     </div>
                     <div class="form-group">
@@ -40,7 +42,8 @@
                     </div>
                     {% endif %}
                 </form>
-                <label class="mt-2" style="display: block; text-align: center;">¿No tienes una cuenta? <a href="{{ url_for('registro_usuario') }}">Registrate</a></label>
+                <label class="mt-2" style="display: block; text-align: center;">¿No tienes una cuenta? <a
+                        href="{{ url_for('registro_usuario') }}">Registrate</a></label>
             </div>
         </div>
     </div>
@@ -63,16 +66,15 @@
                 <form class="form-signin text-center" action="/login_usuario2" method="POST">
                     <div class="form-group">
                         <label for="correo" style="display: block; text-align: left;">Correo electrónico</label>
-                        <input type="text" class="form-control" id="correo" name="correo"
-                            required>
+                        <input type="text" class="form-control" id="correo" name="correo" required>
                     </div>
                     <div class="form-group">
                         <label for="contraseña" style="display: block; text-align: left;">Contraseña</label>
-                        <input type="password" class="form-control" id="contraseña" name="contraseña"
-                           required>
+                        <input type="password" class="form-control" id="contraseña" name="contraseña" required>
                     </div>
                     <button class="btn btn-primary btn-block" type="submit">Iniciar sesión</button>
-                    <label class="mt-2" style="display: block; text-align: center;">¿No tienes una cuenta? <a href="{{ url_for('registro_usuario') }}">Registrate</a></label>
+                    <label class="mt-2" style="display: block; text-align: center;">¿No tienes una cuenta? <a
+                            href="{{ url_for('registro_usuario') }}">Registrate</a></label>
                     {% if error %}
                     <script>
                         document.addEventListener('DOMContentLoaded', function () {
@@ -118,7 +120,7 @@
                     <div class="p-3" style="max-width: 900px;">
                         <h1 class="display-3 text-white mb-md-4">Comer con tus amigos sabe mejor</h1>
                         <div class="card-body rounded-bottom mt-4">
-                            <a href="{{ url_for('reserva') }}" class="btn btn-block py-3 border-10"
+                            <a href="{{ url_for('reserva') }}" class="btn btn-block btn-warning  py-3 border-10 text-dark font-weight-bold"
                                 type="submit">¡Reserva ya!</a>
                         </div>
                     </div>
@@ -128,9 +130,9 @@
                 <img class="w-100" src="{{ url_for('static', filename='img/fondo2.jpg') }}" alt="Image">
                 <div class="carousel-caption d-flex flex-column align-items-center justify-content-center">
                     <div class="p-3" style="max-width: 900px;">
-                        <h1 class="display-3 text-white mb-md-4">Comer con la familia siempre es mejor</h1>
+                        <h1 class="display-3 text-white mb-md-4">¡Disfruta el momento comiendo!</h1>
                         <div class="card-body rounded-bottom mt-4">
-                            <a href="{{ url_for('reserva') }}" class="btn btn-block py-3 border-10"
+                            <a href="{{ url_for('reserva') }}" class="btn btn-block btn-warning py-3 border-10 text-dark font-weight-bold"
                                 type="submit">¡Reserva ya!</a>
                         </div>
                     </div>
@@ -165,21 +167,17 @@
             <div class="col-lg-6 pt-5 pb-lg-5">
                 <div class="about-text bg-white p-4 p-lg-5 my-lg-5" id="sobre">
                     <h6 class="text-primary text-uppercase" style="letter-spacing: 10px;">El GUSTO CJ</h6>
-                    <h1 class="mb-3">¡Ofrecemos los mejores platillos de todo el mundo!</h1>
-                    <p class="text-justify">Nuestro restaurante es un lugar acogedor y auténtico, donde podrás disfrutar
-                        de una amplia
-                        variedad de platos tradicionales y fusiones creativas.
-
-                        Si prefieres explorar diferentes sabores y texturas, nuestro menú también ofrece una amplia
-                        gama de opciones que incluyen mariscos frescos del Caribe y el Pacífico, cortes de carne
-                        jugosos, deliciosos platos vegetarianos y opciones veganas. Nuestros chefs expertos se
-                        aseguran de utilizar ingredientes de alta calidad y combinaciones de especias que realzan
-                        los sabores característicos de cada plato.
-
+                    <h1 class="mb-3">¡Te invitamos a descubrir los sabores del mundo sin salir de Managua!</h1>
+                    <p class="text-justify">Aquí podrás disfrutar de una variedad de platos de cocina japonesa, peruana,
+                        española, tailandesa y sudamericana, elaborados con ingredientes frescos y de calidad.
+                        <br>
+                        <br>
+                        Su menú fusiona los sabores tradicionales de Nicaragua con las
+                        tendencias culinarias internacionales, creando platos innovadores y exquisitos.
                     </p>
                     <div class="row mb-4">
                         <div class="col-6">
-                            <img class="img-fluid" src="{{url_for('static', filename='img/mesas.webp')}}" alt="">
+                            <img class="img-fluid" src="{{url_for('static', filename='img/mesas.jpg')}}" alt="">
                         </div>
                         <div class="col-6">
                             <img class="img-fluid" src="{{url_for('static', filename='img/mesas2.jpg')}}" alt="">
@@ -254,7 +252,7 @@
                             <small class="m-0"><i class=""></i>Mediana</small>
                             <small class="m-0"><i class=""></i>Pequeña</small>
                         </div>
-                        <a class="h5 text-decoration-none" href="">hamburguesas de pollo con papas</a>
+                        <a class="h5 text-decoration-none" href="">Hamburguesas de pollo con papas</a>
                         <div class="border-top mt-4 pt-4">
                             <div class="d-flex justify-content-between">
                                 <h6 class="m-0"><i class="fa fa-star text-primary mr-2"></i>4.5 <small>(250)</small>
@@ -272,7 +270,7 @@
                         <div class="d-flex justify-content-between mb-3">
                             <small class="m-0"><i class=""></i>Chile</small>
                         </div>
-                        <a class="h5 text-decoration-none" href="">camarones fritos con mantequilla</a>
+                        <a class="h5 text-decoration-none" href="">Camarones fritos con mantequilla</a>
                         <div class="border-top mt-4 pt-4">
                             <div class="d-flex justify-content-between">
                                 <h6 class="m-0"><i class="fa fa-star text-primary mr-2"></i>4.5 <small>(250)</small>
@@ -384,8 +382,8 @@
                     <div class="card-header bg-primary text-center p-4">
                         <h1 class="text-white m-0">Reserva Ahora</h1>
                     </div>
-                    <div class="card-body rounded-bottom bg-white p-5">
-                        <a href="{{ url_for('reserva') }}" class="btn btn-block py-3 border-10 "
+                    <div class="card-body rounded-buttom bg-white p-5">
+                        <a href="{{ url_for('reserva') }}" class="btn btn-block btn-primary py-3 border-10 "
                             type="submit">Reservar</a>
                     </div>
                 </div>
@@ -403,11 +401,11 @@
             <h6 class="text-primary text-uppercase" style="letter-spacing: 5px;">Nuestros Chefs</h6>
             <h1>Chefs totalmente especializados</h1>
         </div>
-        <div class="row">
+        <div class="row justify-content-center">
             <div class="col-lg-3 col-md-4 col-sm-6 pb-2">
                 <div class="team-item bg-white mb-4">
                     <div class="team-img position-relative overflow-hidden">
-                        <img class="img-fluid w-100" src="{{url_for('static', filename='img/team-1.jpg')}}" alt="">
+                        <img class="img-fluid w-100" src="{{url_for('static', filename='img/enrique.jpg')}}" alt="">
                         <div class="team-social">
                             <a class="btn btn-outline-primary btn-square" href=""><i class="fab fa-twitter"></i></a>
                             <a class="btn btn-outline-primary btn-square" href=""><i class="fab fa-facebook-f"></i></a>
@@ -416,15 +414,15 @@
                         </div>
                     </div>
                     <div class="text-center py-4">
-                        <h5 class="text-truncate">Maria Carrasco</h5>
-                        <p class="m-0">Mariscos</p>
+                        <h5 class="text-truncate">Enrique Muñoz</h5>
+                        <p class="m-0">Chef profesional</p>
                     </div>
                 </div>
             </div>
             <div class="col-lg-3 col-md-4 col-sm-6 pb-2">
                 <div class="team-item bg-white mb-4">
                     <div class="team-img position-relative overflow-hidden">
-                        <img class="img-fluid w-100" src="{{url_for('static', filename='img/team-2.jpg')}}" alt="">
+                        <img class="img-fluid w-100" src="{{url_for('static', filename='img/chefnic.jpg')}}" alt="">
                         <div class="team-social">
                             <a class="btn btn-outline-primary btn-square" href=""><i class="fab fa-twitter"></i></a>
                             <a class="btn btn-outline-primary btn-square" href=""><i class="fab fa-facebook-f"></i></a>
@@ -433,15 +431,15 @@
                         </div>
                     </div>
                     <div class="text-center py-4">
-                        <h5 class="text-truncate">Ricardo Lopéz</h5>
-                        <p class="m-0">Pollo</p>
+                        <h5 class="text-truncate">John Corea</h5>
+                        <p class="m-0">Pollo a la plancha</p>
                     </div>
                 </div>
             </div>
             <div class="col-lg-3 col-md-4 col-sm-6 pb-2">
                 <div class="team-item bg-white mb-4">
                     <div class="team-img position-relative overflow-hidden">
-                        <img class="img-fluid w-100" src="{{url_for('static', filename='img/team-3.jpg')}}" alt="">
+                        <img class="img-fluid w-100" src="{{url_for('static', filename='img/Adriana.jpg')}}" alt="">
                         <div class="team-social">
                             <a class="btn btn-outline-primary btn-square" href=""><i class="fab fa-twitter"></i></a>
                             <a class="btn btn-outline-primary btn-square" href=""><i class="fab fa-facebook-f"></i></a>
@@ -450,25 +448,8 @@
                         </div>
                     </div>
                     <div class="text-center py-4">
-                        <h5 class="text-truncate">Celeste Ramírez</h5>
-                        <p class="m-0">Carne</p>
-                    </div>
-                </div>
-            </div>
-            <div class="col-lg-3 col-md-4 col-sm-6 pb-2">
-                <div class="team-item bg-white mb-4">
-                    <div class="team-img position-relative overflow-hidden">
-                        <img class="img-fluid w-100" src="{{url_for('static', filename='img/team-4.jpg')}}" alt="">
-                        <div class="team-social">
-                            <a class="btn btn-outline-primary btn-square" href=""><i class="fab fa-twitter"></i></a>
-                            <a class="btn btn-outline-primary btn-square" href=""><i class="fab fa-facebook-f"></i></a>
-                            <a class="btn btn-outline-primary btn-square" href=""><i class="fab fa-instagram"></i></a>
-                            <a class="btn btn-outline-primary btn-square" href=""><i class="fab fa-linkedin-in"></i></a>
-                        </div>
-                    </div>
-                    <div class="text-center py-4">
-                        <h5 class="text-truncate">Miguel Aguilar</h5>
-                        <p class="m-0">Vegetariano</p>
+                        <h5 class="text-truncate">Adriana Robleto</h5>
+                        <p class="m-0">Gallo pinto</p>
                     </div>
                 </div>
             </div>
@@ -490,7 +471,8 @@
                 <img class="img-fluid mx-auto" src="{{url_for('static', filename='img/carloslol.jpg')}}"
                     style="width: 100px; height: 100px;">
                 <div class="testimonial-text bg-white p-4 mt-n5">
-                    <p class="mt-5">La comida vegetariana es lo mejor que he probado en toda nicaragua!
+                    <p class="mt-5">La comida vegetariana es lo mejor que he probado en toda nicaragua, espero volver
+                        más!
                     </p>
                     <h5 class="text-truncate">Carlos Vasquez</h5>
                     <span>Ingeniero y master LOL</span>
@@ -500,33 +482,31 @@
                 <img class="img-fluid mx-auto" src="{{url_for('static', filename='img/jho9natan.jpg')}}"
                     style="width: 100px; height: 100px;">
                 <div class="testimonial-text bg-white p-4 mt-n5">
-                    <p class="mt-5">Sin dudas comere todas las noches en este restaurante, me encantan las
-                        albondigas, sin embargo, le faltaba un poco de sal.
+                    <p class="mt-5">La comida es realmente buena y compensa cualquier aspecto negativo.
                     </p>
                     <h5 class="text-truncate">Jhonatan Medina</h5>
                     <span>Critico profesional</span>
                 </div>
             </div>
             <div class="text-center">
-                <img class="img-fluid mx-auto" src="{{url_for('static', filename='img/testimonial-4.jpg')}}"
+                <img class="img-fluid mx-auto" src="{{url_for('static', filename='img/enrique_cuadrado.jpg')}}"
                     style="width: 100px; height: 100px;">
                 <div class="testimonial-text bg-white p-4 mt-n5">
                     <p class="mt-5">Faltan aspectos que mejorar en el local pero puedo decir que la comida lo
                         compensa, muy buena.
                     </p>
-                    <h5 class="text-truncate">Matias Guadamuz</h5>
-                    <span>Diseñador web</span>
+                    <h5 class="text-truncate">Enrique Muñoz</h5>
+                    <span>Experto en sistemas de información</span>
                 </div>
             </div>
             <div class="text-center">
-                <img class="img-fluid mx-auto" src="{{url_for('static', filename='img/testimonial-4.jpg')}}"
+                <img class="img-fluid mx-auto" src="{{url_for('static', filename='img/belen.jpg')}}"
                     style="width: 100px; height: 100px;">
                 <div class="testimonial-text bg-white p-4 mt-n5">
-                    <p class="mt-5">Dolor et eos labore, stet justo sed est sed. Diam sed sed dolor stet amet eirmod
-                        eos labore diam
+                    <p class="mt-5">El pollo a la parilla estuvo algo salado, pero nada que no se pudiese soportar por el resto del menú!
                     </p>
-                    <h5 class="text-truncate">Client Name</h5>
-                    <span>Profession</span>
+                    <h5 class="text-truncate">Belén Umanzor</h5>
+                    <span>Diseñadora gráfica</span>
                 </div>
             </div>
         </div>

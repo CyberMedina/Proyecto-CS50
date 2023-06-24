@@ -8,7 +8,7 @@ from helpers import login_requiredColaborador, login_requiredCliente, login_requ
 from urllib.parse import urlencode #Dependencia utilizada para redirigir al modal de inicio de sesión
 import urllib.parse #
 from config import connectionBD
-from flask import Flask
+from flask import Flask, flash, get_flashed_messages
 from flask_mail import Mail, Message
 from flask import Flask, g #Con esto podemos tener una variable global para poder ser usadas nuestros HTML con jinja
 import os
@@ -461,7 +461,7 @@ def aceptar_solicitud(id_reservas):
 
         if cantperson > summxsilla:
             error = "La cantidad de sillas maximas del total de las mesas seleccionadas no es suficiente para satisfacer la cantidad de personas de la reserva."
-            return render_template('aceptar_solicitud.html', error=error, rmesas=rmesas ,user_row=user_row)
+            return redirect(url_for('aceptar_solicitud.html', rmesas=rmesas ,user_row=user_row))
             
         #validacion de sillas disponibles
         #aqui son las locuras de las sillas
@@ -509,7 +509,8 @@ def aceptar_solicitud(id_reservas):
         cursor.execute("update reservas set usersis_id = %s, estado = %s, fecharespuesta = %s WHERE id_reservas = %s", (usersis_id,estado,fecharespuesta,id_reservas))
         db.commit()
         msg = "La reserva ha sido aprobada"
-        return redirect(url_for('solicitudes_pendientes', msg=msg))
+        flash(msg)
+        return render_template('solicitudes_pendientes.html',)
     
 
 
@@ -580,8 +581,8 @@ def solicitudes_aprobadas():
     solicitudes = cursor.fetchall()
     cursor.close()
 
-
-    return render_template('solicitudes_aprobadas.html', solicitudes=solicitudes)
+    flash_messages = get_flashed_messages()
+    return render_template('solicitudes_aprobadas.html', solicitudes=solicitudes, flash_messages=flash_messages)
 
 #Solicitudes rechazadas
 @app.route('/solicitudes_rechazadas', methods=['GET', 'POST'])
