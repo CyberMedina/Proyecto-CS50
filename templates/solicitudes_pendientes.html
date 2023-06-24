@@ -14,6 +14,30 @@
 
 {% block body %}
 <h2>Solicitudes pendientes</h2>
+{% if msg %}
+<div class="alert hide">
+	<span class="fas fa-exclamation-circle"></span>
+	<span class="msg">{{ error }}</span>
+	<div class="close-btn">
+		<span class="fas fa-times"></span>
+	</div>
+</div>
+<script>
+	$(document).ready(function () {
+		$('.alert').addClass("show");
+		$('.alert').removeClass("hide");
+		$('.alert').addClass("showAlert");
+		setTimeout(function () {
+			$('.alert').removeClass("show");
+			$('.alert').addClass("hide");
+		}, 5000);
+	});
+	$('.close-btn').click(function () {
+		$('.alert').removeClass("show");
+		$('.alert').addClass("hide");
+	});
+</script>
+{% endif %}
 <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.11.5/dist/umd/popper.min.js" integrity="sha384-Xe+8cL9oJa6tN/veChSP7q+mnSPaj5Bcu9mPX5F5xIGE0DVittaqT5lorf0EI7Vk" crossorigin="anonymous"></script>
 
 <form class="table-responsive small" method="GET, POST" action="">

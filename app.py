@@ -19,7 +19,7 @@ from datetime import datetime
 
 
 app=Flask(__name__)
-app.debug = True
+
 
 app.jinja_env.globals['g'] = g #Se instancia la variable global para ser usada en jinja
 
@@ -508,7 +508,8 @@ def aceptar_solicitud(id_reservas):
         estado = 1
         cursor.execute("update reservas set usersis_id = %s, estado = %s, fecharespuesta = %s WHERE id_reservas = %s", (usersis_id,estado,fecharespuesta,id_reservas))
         db.commit()
-        return redirect(url_for('solicitudes_pendientes'))
+        msg = "La reserva ha sido aprobada"
+        return redirect(url_for('solicitudes_pendientes', msg=msg))
     
 
 
@@ -642,3 +643,4 @@ def recepcionista_reservas():
 if __name__=='__main__':
     
     app.run()
+    app.debug = True
