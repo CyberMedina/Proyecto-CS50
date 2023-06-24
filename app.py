@@ -673,6 +673,82 @@ def recepcionista_reservas():
 
     return render_template('recepcionista_reservas.html', solicitudes=solicitudes)
 
+@app.route('/llegada_reserva/<int:id_reservas>', methods=['GET', 'POST'])
+def llegada_reserva(id_reservas):
+    db = connectionBD()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("update reservas set estado = 3 where id_reservas = %s",(id_reservas,))
+
+    db.commit()
+
+    return redirect("/recepcionista_reservas")
+
+@app.route('/cancela_reserva/<int:id_reservas>', methods=['GET', 'POST'])
+def cancela_reserva(id_reservas):
+    db = connectionBD()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("delete from reservamesa where id_reservas = %s",(id_reservas,))
+    cursor.execute("delete from reservasillas where id_reservas = %s",(id_reservas,))
+    cursor.execute("update reservas set estado = 4 where id_reservas = %s",(id_reservas,))
+
+    db.commit()
+
+    return redirect("/recepcionista_reservas")
+
+@app.route('/recepcionista_reserva_activa', methods=['GET', 'POST'])
+def recepcionista_reserva_activa():
+    # Obtener las solicitudes pendientes de la base de datos
+    db = connectionBD()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT u.user_id, u.nombres, u.apellidos, r.id_reservas, r.cantperson, TIME_FORMAT(r.hora, '%h:%i %p') AS hora, r.estancia, DATE_FORMAT(r.fecha, '%Y-%m-%d') AS fecha, r.estado, DATE_FORMAT(r.registroreserva, '%Y-%m-%d %h:%i %p') AS registroreserva, DATE_FORMAT(r.fecharespuesta, '%Y-%m-%d %h:%i %p') AS fecharespuesta FROM reservas r INNER JOIN usuarios u ON r.user_id = u.user_id WHERE r.estado = 3 AND DATE(r.fecha) = CURDATE() ORDER BY r.registroreserva DESC;")
+    solicitudes = cursor.fetchall()
+    cursor.close()
+
+
+    return render_template('recepcionista_reserva_activa.html', solicitudes=solicitudes)
+
+@app.route('/cancela_reserva_activa/<int:id_reservas>', methods=['GET', 'POST'])
+def cancela_reserva_activa(id_reservas):
+    db = connectionBD()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("delete from reservamesa where id_reservas = %s",(id_reservas,))
+    cursor.execute("delete from reservasillas where id_reservas = %s",(id_reservas,))
+    cursor.execute("update reservas set estado = 5 where id_reservas = %s",(id_reservas,))
+
+    db.commit()
+
+    return redirect("/recepcionista_reserva_activa")
+
+@app.route('/historial', methods=['GET', 'POST'])
+def historial():
+    # Obtener las solicitudes pendientes de la base de datos
+    db = connectionBD()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SELECT u.user_id, u.nombres, u.apellidos, r.id_reservas, r.cantperson, TIME_FORMAT(r.hora, '%h:%i %p') AS hora, r.estancia, DATE_FORMAT(r.fecha, '%Y-%m-%d') AS fecha, r.estado, DATE_FORMAT(r.registroreserva, '%Y-%m-%d %h:%i %p') AS registroreserva, DATE_FORMAT(r.fecharespuesta, '%Y-%m-%d %h:%i %p') AS fecharespuesta FROM reservas r INNER JOIN usuarios u ON r.user_id = u.user_id WHERE r.estado = 5 AND DATE(r.fecha) = CURDATE() ORDER BY r.registroreserva DESC;")
+    solicitudes = cursor.fetchall()
+    cursor.close()
+
+
+    return render_template('historial.html', solicitudes=solicitudes)
+
+@app.route('/ver_historial/<int:id_reservas>', methods=['GET', 'POST'])
+def ver_historial(id_reservas):
+
+
+    db = connectionBD()
+    cursor = db.cursor(dictionary=True)
+    cursor.execute("SET lc_time_names = 'es_ES'")
+    cursor.execute("SELECT u.user_id, u.nombres, u.apellidos, u.cedula, u.correo, u.contraseña, u.telefono, r.id_reservas, r.cantperson, TIME_FORMAT(r.hora, '%h:%i %p') AS hora, r.estancia, DATE_FORMAT(r.fecha, '%W %d de %M de %Y') AS fecha, r.estado, DATE_FORMAT(r.registroreserva, '%Y-%m-%d %h:%i %p') AS registroreserva, DATE_FORMAT(r.fecharespuesta, '%Y-%m-%d %h:%i %p') AS fecharespuesta, r.descripcion FROM reservas r INNER JOIN usuarios u ON r.user_id = u.user_id WHERE r.id_reservas = %s", (id_reservas,))
+    #cursor.execute("SELECT id_mesa FROM reservamesa WHERE id_reservas = %s", (id_reservas,))
+    user_row = cursor.fetchone()
+
+    # Ahora obtener los ids de las mesas reservadas
+    id_reservas = user_row['id_reservas']
+    cursor.execute("SELECT id_mesa FROM reservamesa WHERE id_reservas = %s", (id_reservas,))
+    ids_mesas = cursor.fetchall()
+
+    return render_template('ver_historial.html', user_row=user_row, ids_mesas=ids_mesas)
+
 
 
 if __name__=='__main__':

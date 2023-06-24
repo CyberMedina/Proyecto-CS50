@@ -1,6 +1,6 @@
 {% extends './basecolaboradores.html'%}
 
-{% block title%}Reservas{% endblock %}
+{% block title%}Reservas activas{% endblock %}
 
 {% block customCSS %}
 <link rel="stylesheet" href="{{ url_for('static', filename='css/dashboard.css')}}">
@@ -41,10 +41,12 @@
                     Cliente en mesa
                     {% elif solicitud.estado == 4 %}
                     No presento
+                    {% elif solicitud.estado == 5 %}
+                    Salida
                     {% endif %}
                 </td>
-                <td><a href="/llegada_reserva/{{ solicitud.id_reservas }}" class="btn btn-success">Llegada</a>
-                    <a href="/cancela_reserva/{{ solicitud.id_reservas }}" class="btn btn-danger">Cancelar</a>
+                <td>
+                    <a href="/cancela_reserva_activa/{{ solicitud.id_reservas }}" class="btn btn-danger">Salida</a>
             </tr>
             {% endfor %}
         </tbody>
