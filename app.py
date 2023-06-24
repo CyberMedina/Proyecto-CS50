@@ -510,7 +510,35 @@ def aceptar_solicitud(id_reservas):
         db.commit()
         msg = "La reserva ha sido aprobada"
         flash(msg)
-        return render_template('solicitudes_pendientes.html',)
+
+        cursor = db.cursor(dictionary=True)
+        cursor.execute("SET lc_time_names = 'es_ES'")
+        cursor.execute("SELECT u.user_id, u.nombres, u.apellidos, u.cedula, u.correo, u.contraseña, u.telefono, r.id_reservas, r.cantperson, TIME_FORMAT(r.hora, '%h:%i %p') AS hora, r.estancia, DATE_FORMAT(r.fecha, '%W %d de %M de %Y') AS fecha, r.estado, DATE_FORMAT(r.registroreserva, '%Y-%m-%d %h:%i %p') AS registroreserva, DATE_FORMAT(r.fecharespuesta, '%Y-%m-%d %h:%i %p') AS fecharespuesta, r.descripcion FROM reservas r INNER JOIN usuarios u ON r.user_id = u.user_id WHERE r.id_reservas = %s", (id_reservas,))
+        #cursor.execute("SELECT id_mesa FROM reservamesa WHERE id_reservas = %s", (id_reservas,))
+        user_row = cursor.fetchone()
+
+        # Ahora obtener los ids de las mesas reservadas
+        id_reservas = user_row['id_reservas']
+        cursor.execute("SELECT id_mesa FROM reservamesa WHERE id_reservas = %s", (id_reservas,))
+        results = cursor.fetchall()
+        ids_mesas = [result['id_mesa'] for result in results]
+
+
+        destinatario=user_row['correo']
+        nombres=user_row['nombres']
+        apellidos=user_row['apellidos']
+        fecha=user_row['fecha']
+        hora=user_row['hora']
+
+
+        # Enviar correo electrónico con el motivo de rechazo
+        enviar_correo_aceptacion(destinatario, nombres, apellidos, fecha, hora, ids_mesas)
+
+
+
+        return render_template('solicitudes_pendientes.html')
+
+
     
 
 
@@ -570,6 +598,12 @@ AND (DATE(r.fecha) = DATE(%s))
 
     
     return render_template('aceptar_solicitud.html',rmesas=rmesas ,user_row=user_row,countsillasall=countsillasall)
+
+# Función para enviar correo de rechazo
+def enviar_correo_aceptacion(destinatario, nombres, apellidos, fecha, hora, ids_mesas):
+    asunto = 'Aceptación de solicitud de reserva en el restaurante El gusto CJ'
+    cuerpo = f'Estimado/a {nombres} {apellidos}\n\nNos complace confirmarle que su reserva en el restaurante El gusto CJ ha sido aprobada. Le agradecemos su preferencia y esperamos que disfrute de nuestra gastronomía.\nLos detalles de su reserva son los siguientes: \n\nFecha de la reserva: {fecha}\nHora: {hora} \nMesa No.{ids_mesas}\n\nLe recordamos que debe presentarse en el restaurante a la hora indicada en su reserva. En caso de retraso, su reserva será cancelada después de 15 minutos.\n\nAtentamente\nEl equipo de El gusto CJ'
+    enviar_correo(destinatario, asunto, cuerpo)
 
 #Solitudes aprobadas
 @app.route('/solicitudes_aprobadas', methods=['GET', 'POST'])
