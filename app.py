@@ -411,7 +411,6 @@ def enviar_correo(destinatario, asunto, cuerpo):
 
 @app.route('/aceptar_solicitud/<int:id_reservas>', methods=['GET', 'POST'])
 def aceptar_solicitud(id_reservas):
-     
     if request.method == "POST":
         db = connectionBD()
         cursor = db.cursor(dictionary=True)
@@ -422,51 +421,30 @@ def aceptar_solicitud(id_reservas):
         fechreser = datetime.strptime(user_row['fechreser'], '%Y-%m-%d %H:%M:%S')
     
   
-        cursor.execute("""SELECT mesas.id_mesa, mesas.id_tipmesa,tipomesa.max_sillas
-        FROM mesas
-        INNER JOIN tipomesa on mesas.id_mesa = tipomesa.id_tipmesa
-        WHERE mesas.id_mesa NOT IN (
-        SELECT m.id_mesa
-        FROM mesas m
-        INNER JOIN reservamesa rm ON rm.id_mesa = m.id_mesa
-        INNER JOIN reservas r ON r.id_reservas = rm.id_reservas
-        WHERE 
-        (
-            (
-            ((CONCAT(r.fecha, ' ', r.hora) <= %s) AND (r.fechahorasalida IS NULL OR r.fechahorasalida > %s))
-            OR
-            (CONCAT(r.fecha, ' ', r.hora) < %s AND r.fechahorasalida IS NULL)
-        )
-        AND (DATE(r.fecha) = DATE(%s))
-            )
-        )
-        """, (fechreser,fechreser,fechreser,fechreser))
+        cursor.execute("""SELECT mesas.id_mesa, mesas.id_tipmesa, tipomesa.max_sillas
+FROM mesas
+INNER JOIN tipomesa ON mesas.id_tipmesa = tipomesa.id_tipmesa
+WHERE mesas.id_mesa NOT IN (
+SELECT m.id_mesa
+FROM mesas m
+INNER JOIN reservamesa rm ON rm.id_mesa = m.id_mesa
+INNER JOIN reservas r ON r.id_reservas = rm.id_reservas
+WHERE 
+(
+    (
+    ((CONCAT(r.fecha, ' ', r.hora) <= %s) AND (r.fechahorasalida IS NULL OR r.fechahorasalida > %s))
+    OR
+    (CONCAT(r.fecha, ' ', r.hora) < %s AND r.fechahorasalida IS NULL)
+)
+AND (DATE(r.fecha) = DATE(%s))
+    )
+)
+""", (fechreser,fechreser,fechreser,fechreser))
 
         # cursor.execute("SELECT m.id_mesa, t.max_sillas FROM mesas m INNER JOIN tipomesa t ON m.id_tipmesa = t.id_tipmesa")
         rmesas = cursor.fetchall()
 
         cantperson = user_row['cantperson']
-        
-        # Validacion de la cantidad de sillas disponibles en las mesas
-        summxsilla = 0
-        for getid in request.form.getlist('cbmesas'):
-            cursor.execute("""SELECT t.max_sillas
-            FROM mesas m
-            INNER JOIN tipomesa t ON m.id_tipmesa = t.id_tipmesa
-            where 
-            m.id_mesa = %s""",(getid,))
-            
-            summxsilla = summxsilla + int(cursor.fetchone()['max_sillas'])
-        print(summxsilla)
-
-        if cantperson > summxsilla:
-            error = "La cantidad de sillas maximas del total de las mesas seleccionadas no es suficiente para satisfacer la cantidad de personas de la reserva."
-            return redirect(url_for('aceptar_solicitud.html', rmesas=rmesas ,user_row=user_row))
-            
-        #validacion de sillas disponibles
-        #aqui son las locuras de las sillas
-        cantperson = user_row['cantperson']
-
         # obtenemos cantidad de sillas disponibles (maximo la cantidad de personas de la reserva)
         cursor.execute("""SELECT sillas.id_silla
         FROM sillas
@@ -492,9 +470,35 @@ def aceptar_solicitud(id_reservas):
         # Porque eso significaria que no hay sillas disponibles para satisfacer la reserva a esa hora
         sillas = cursor.fetchall()
         countsillas = len(sillas)
-        if countsillas < cantperson:
-            error = "No se puede reservar debido a que la cantidad de personas es mayor a la cantidad de sillas disponible"
-            return render_template('aceptar_solicitud.html', error=error, rmesas=rmesas ,user_row=user_row)
+        
+        # Validación mejorada de sillas
+        summxsilla = 0
+        selected_mesas = request.form.getlist('cbmesas')
+        
+        # Verificar que se seleccionó al menos una mesa
+        if not selected_mesas:
+            error = "Debe seleccionar al menos una mesa para la reserva."
+            return render_template('aceptar_solicitud.html', error=error, rmesas=rmesas, user_row=user_row, countsillas=countsillas)
+
+        # Calcular capacidad total de las mesas seleccionadas
+        for getid in selected_mesas:
+            cursor.execute("""
+                SELECT m.id_mesa, t.max_sillas
+                FROM mesas m
+                INNER JOIN tipomesa t ON m.id_tipmesa = t.id_tipmesa
+                WHERE m.id_mesa = %s
+            """, (getid,))
+            result = cursor.fetchone()
+            if result:
+                summxsilla += int(result['max_sillas'])
+            else:
+                error = f"Error: La mesa {getid} no tiene un tipo válido asignado."
+                return render_template('aceptar_solicitud.html', error=error, rmesas=rmesas, user_row=user_row, countsillas=countsillas)
+
+        # Validación de capacidad
+        if cantperson > summxsilla:
+            error = f"La reserva es para {cantperson} personas, pero las mesas seleccionadas solo tienen capacidad para {summxsilla} personas."
+            return render_template('aceptar_solicitud.html', error=error, rmesas=rmesas, user_row=user_row, countsillas=countsillas)
 
         for getid in request.form.getlist('cbmesas'):
             cursor.execute("insert into reservamesa(id_reservas,id_mesa) VALUES (%s,%s)",(id_reservas,getid))
@@ -522,6 +526,7 @@ def aceptar_solicitud(id_reservas):
         cursor.execute("SELECT id_mesa FROM reservamesa WHERE id_reservas = %s", (id_reservas,))
         results = cursor.fetchall()
         ids_mesas = [result['id_mesa'] for result in results]
+        id_mesa = ids_mesas[0]
 
 
         destinatario=user_row['correo']
@@ -532,11 +537,46 @@ def aceptar_solicitud(id_reservas):
 
 
         # Enviar correo electrónico con el motivo de rechazo
-        enviar_correo_aceptacion(destinatario, nombres, apellidos, fecha, hora, ids_mesas)
+        enviar_correo_aceptacion(destinatario, nombres, apellidos, fecha, hora, id_mesa)
 
+        print(f"Cantidad de personas solicitadas: {cantperson}")
+        print(f"Mesas seleccionadas: {selected_mesas}")
+        for getid in selected_mesas:
+            cursor.execute("""
+                SELECT m.id_mesa, t.max_sillas
+                FROM mesas m
+                INNER JOIN tipomesa t ON m.id_tipmesa = t.id_tipmesa
+                WHERE m.id_mesa = %s
+            """, (getid,))
+            result = cursor.fetchone()
+            print(f"Mesa {getid}: capacidad {result['max_sillas'] if result else 'no encontrada'}")
+        print(f"Capacidad total calculada: {summxsilla}")
 
+        print("=== DEBUGGING INFORMACIÓN ===")
+        print(f"Cantidad de personas en la reserva: {cantperson}")
+        print("Mesas disponibles:")
+        for mesa in rmesas:
+            print(f"Mesa {mesa['id_mesa']}: {mesa['max_sillas']} personas")
 
-        return render_template('solicitudes_pendientes.html')
+        print("\nMesas seleccionadas:")
+        selected_mesas = request.form.getlist('cbmesas')
+        print(f"IDs de mesas seleccionadas: {selected_mesas}")
+
+        summxsilla = 0
+        for getid in selected_mesas:
+            cursor.execute("""
+                SELECT m.id_mesa, t.max_sillas
+                FROM mesas m
+                INNER JOIN tipomesa t ON m.id_tipmesa = t.id_tipmesa
+                WHERE m.id_mesa = %s
+            """, (getid,))
+            result = cursor.fetchone()
+            if result:
+                print(f"Mesa {getid} tiene capacidad para {result['max_sillas']} personas")
+                summxsilla += int(result['max_sillas'])
+        print(f"Capacidad total de mesas seleccionadas: {summxsilla}")
+
+        return redirect(url_for('solicitudes_pendientes'))
 
 
     
@@ -551,9 +591,9 @@ def aceptar_solicitud(id_reservas):
     fechreser = datetime.strptime(user_row['fechreser'], '%Y-%m-%d %H:%M:%S')
     
   
-    cursor.execute("""SELECT mesas.id_mesa, mesas.id_tipmesa,tipomesa.max_sillas
+    cursor.execute("""SELECT mesas.id_mesa, mesas.id_tipmesa, tipomesa.max_sillas
 FROM mesas
-INNER JOIN tipomesa on mesas.id_mesa = tipomesa.id_tipmesa
+INNER JOIN tipomesa ON mesas.id_tipmesa = tipomesa.id_tipmesa
 WHERE mesas.id_mesa NOT IN (
 SELECT m.id_mesa
 FROM mesas m
@@ -709,11 +749,13 @@ def recepcionista_reserva_activa():
 
 @app.route('/cancela_reserva_activa/<int:id_reservas>', methods=['GET', 'POST'])
 def cancela_reserva_activa(id_reservas):
+    fechasalida = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
     db = connectionBD()
     cursor = db.cursor(dictionary=True)
     cursor.execute("delete from reservamesa where id_reservas = %s",(id_reservas,))
     cursor.execute("delete from reservasillas where id_reservas = %s",(id_reservas,))
-    cursor.execute("update reservas set estado = 5 where id_reservas = %s",(id_reservas,))
+    cursor.execute("update reservas set estado = 5,fechahorasalida = %s  where id_reservas = %s",(fechasalida,id_reservas))
+    # cursor.execute("update reservas set fechahorasalida = %s where id_reservas = %s",fecharespuesta,id_reservas,)
 
     db.commit()
 

@@ -1,14 +1,20 @@
 from flask_session import Session
 from flask_mysqldb import MySQL, MySQLdb
+from dotenv import load_dotenv
+import os
 import mysql.connector
 
 
+load_dotenv()
+
+# Configuración de la base de datos
+
 def connectionBD():
     db = mysql.connector.connect(
-        host="proyectocs50.mysql.database.azure.com",
-        user="localhost",
-        password="cjs-1234",
-        database="proyectocs50"
+        host= os.getenv("DB_HOST"),
+        user= os.getenv("DB_USER"),
+        password= os.getenv("DB_PASSWORD"),
+        database = os.getenv("DB_NAME")
     )
     return db
 
