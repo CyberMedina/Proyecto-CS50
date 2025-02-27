@@ -1,54 +1,64 @@
 # El Gusto CJ 🍝
 
-Proyecto final desarrollado para el curso CS50. Se trata de una aplicación web que facilita la reserva de mesas en un restaurante. Los usuarios pueden registrarse y enviar solicitudes de reserva, mientras que los colaboradores del restaurante tienen la opción de aprobar o rechazar dichas solicitudes, notificando la decisión a través de correo electrónico.
+Proyecto final desarrollado para el curso CS50. Se trata de una aplicación web que facilita la reserva de mesas en un restaurante. Los usuarios pueden registrarse y enviar solicitudes de reserva, mientras que los colaboradores del restaurante pueden aprobar o rechazar dichas solicitudes, notificando la decisión a través de correo electrónico.
 
 ## 📚 Tabla de Contenidos
 
-- [Características](#-características)
-- [Roles](#-roles)
-- [Flujo de Proceso](#-flujo-de-proceso)
-- [Tecnologías Usadas](#-tecnologías-usadas)
-- [Instalación](#-instalación)
-- [Uso](#-uso)
-- [Contribuciones](#-contribuciones)
-- [Contacto](#-contacto)
+- [Roles](#-roles)  
+- [Características](#-características)  
+- [Tecnologías Usadas](#-tecnologías-usadas)  
+- [Instalación](#-instalación)  
+- [Uso](#-uso)  
+- [Contacto](#-contacto)  
 
 ## 👥 Roles
 
-- **Encargado de gestión de reservas**: Puede gestionar usuarios, ver reportes y administrar las reservas.
-- **Recepcionista**: Maneja las reservas diarias y asiste en la organización de las mesas.
-- **Cliente**: Puede registrarse, acceder a su perfil y gestionar sus datos y reservas.
+- **Encargado de gestión de reservas**: Aceptar y eliminar reservas.
+- **Recepcionista**:Gestiona las llegadas y salidas de los clientes con respecto a sus reservas.
+- **Cliente**: Puede registrarse, acceder a su perfil y realizar solicitudes de reservas.
 
 ## 🌟 Características
 
-### Cliente:
-- 🔹 Registro e inicio de sesión.
-  <video src="https://github.com/user-attachments/assets/ed8d0463-66e6-485b-ae5b-71d27471d5a7" controls width="400"></video>
+### Cliente
+- 🔹 **Registro e inicio de sesión**  
+  <video src="https://github.com/user-attachments/assets/ed8d0463-66e6-485b-ae5b-71d27471d5a7" controls width="400"></video>  
 
-- 🔹 Realizar reservas.
-  
+- 🔹 **Realizar reservas**  
   <video src="https://github.com/user-attachments/assets/56fbfad5-ea55-4f10-902f-50bb6cce6bae" controls width="400"></video>
 
-### Colaboradores:
-- 🔹 Modo claro y oscuro en la vista de administrador.
-  
-  <video src="https://github-production-user-asset-6210df.s3.amazonaws.com/114252123/416982681-b4c92b19-3c19-470b-ab66-6354b1fda6ed.mp4" controls width="600"></video>
+- 🔹 **Validación solicitud reserva pendiente activa**
+  <video src="https://github.com/user-attachments/assets/0e84b97a-a3de-4703-a2e5-2ac7f430a008" controls width="400"></video>  
+   
 
-### Encargado de gestión de reservas:
-- 🔹 Aprobación y rechazo de reservas.
-- 🔹 Validación de disponibilidad de mesas y sillas según su estado (ocupado/libre) o cantidad requerida.
-- 🔹 Envío de correos electrónicos notificando la aprobación o rechazo de las reservas.
+- 🔹 **Recibir notificaciones por correo** sobre la aprobación o rechazo de la reserva  
+  <img src="https://github.com/user-attachments/assets/d3b15878-0f1b-439a-83b6-eddffe1bf2d4" width="1000">  
+
+  <video src="https://github.com/user-attachments/assets/e3cc338f-d6ef-47dc-bce4-202cb3f4fbd4" controls width="400"></video>  
+
+### Colaboradores
+- 🔹 **Modo claro y oscuro** en la interfaz  
+  <img src="https://github.com/user-attachments/assets/c3643f06-0f72-4b79-afa7-c3d234c75b80" width="1000">
+
+- 🔹 **Roles y permisos**
+
+  <video src="https://github.com/user-attachments/assets/5c9b4202-65f4-4076-9888-6feece6f190b" controls width="400"></video>  
+
+
+### Encargado de gestión de reservas
+- 🔹 **Aprobación y rechazo de reservas**  
+  Validación de disponibilidad de mesas y sillas según su estado (ocupado/libre) o cantidad requerida.  
+  <video src="https://github.com/user-attachments/assets/4cbbefd0-5f02-4efd-bdfe-d0bd53f80491" controls width="400"></video>  
 
 ## 🛠️ Tecnologías Usadas
 
-- **Frontend:** HTML, CSS, Bootstrap.
-- **Backend:** Flask, MySQL.
+- **Frontend:** HTML, CSS, Bootstrap.  
+- **Backend:** Python, Flask y MySQL.  
 
 ## ⚙️ Instalación
 
 1. Clona el repositorio:  
    ```bash
-   git clone https://github.com/tu_usuario/tu_repositorio.git
+   git clone https://github.com/CyberMedina/Proyecto-CS50.git
    ```
 2. Instala las dependencias:  
    ```bash
@@ -61,20 +71,12 @@ Proyecto final desarrollado para el curso CS50. Se trata de una aplicación web 
 
 ## 🚀 Uso
 
-- Para acceder como **Administrador**, usa `admin@example.com` y contraseña `123456`.
-- Para acceder como **Usuario**, regístrate en la plataforma.
+- Para acceder como **Encargado de gestión de reservas**, usa `gestion` y contraseña `123456`.  
+- Para acceder como **Recepcionista**, usa `recepcionista` y contraseña `123456`.
+- Para acceder como **Cliente**, regístrate en la plataforma.  
 
-## 🤝 Contribuciones
-
-Si deseas contribuir, por favor sigue estos pasos:
-1. Haz un fork del repositorio.
-2. Crea una rama con tu funcionalidad (`git checkout -b feature-nueva`).
-3. Sube tus cambios (`git commit -m 'Agregada nueva feature'`).
-4. Abre un Pull Request.
 
 ## 📬 Contacto
 
-- ✉️ **Correo:** tuemail@example.com
-- 💼 **LinkedIn:** [Tu Nombre](https://linkedin.com/in/tuusuario)
-- 🐦 **Twitter:** [@tuusuario](https://twitter.com/tuusuario)
-
+- ✉️ **Correo:** jhonatanmedina5255@gmail.com 
+- 💼 **LinkedIn:** https://www.linkedin.com/in/jhonatan-medina-308713232/
