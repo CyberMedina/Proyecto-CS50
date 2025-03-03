@@ -1,3 +1,6 @@
+  <img src="https://github.com/CyberMedina/Proyecto-CS50/blob/main/static/img/github/banner_gusto_cj.png?raw=true" width="1000">
+
+
 # El Gusto CJ 🍝
 
 Proyecto final desarrollado para el curso CS50. Se trata de una aplicación web que facilita la reserva de mesas en un restaurante. Los usuarios pueden registrarse y enviar solicitudes de reserva, mientras que los colaboradores del restaurante pueden aprobar o rechazar dichas solicitudes, notificando la decisión a través de correo electrónico.
