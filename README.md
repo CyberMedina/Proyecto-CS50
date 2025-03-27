@@ -81,5 +81,6 @@ Proyecto final desarrollado para el curso CS50. Se trata de una aplicación web 
 
 ## 📬 Contacto
 
-- ✉️ **Correo:** jhonatanmedina5255@gmail.com 
-- 💼 **LinkedIn:** https://www.linkedin.com/in/jhonatan-medina-308713232/
+- ✉️ **Correo:** [jhonatanmedina5255@gmail.com](mailto:jhonatanmedina5255@gmail.com)
+- 💼 **LinkedIn:** <a href="https://www.linkedin.com/in/jhonatan-jazmil-medina-aguirre-28862a358" target="_blank">www.linkedin.com/in/jhonatan-jazmil-medina-aguirre-28862a358</a>
+
